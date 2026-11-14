@@ -1,0 +1,670 @@
+// OjaBook data model.
+//
+// Conventions (see Implementation Guide sections 7 and 8):
+//  - NGN is stored as integer kobo in BigInt columns. Never as floating point.
+//  - Inventory quantities and conversion factors are Decimal (exact).
+//  - Every business owned row carries businessId.
+//  - Ledger, stock movement and audit tables are append only. Triggers in the
+//    first migration reject UPDATE and DELETE on them.
+//  - Posted records are corrected with reversing records, never edited.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ───────────────────────────── Enums ─────────────────────────────
+
+enum MemberRole {
+  OWNER
+  MANAGER
+  CASHIER
+  INVENTORY_MANAGER
+}
+
+enum MemberStatus {
+  ACTIVE
+  SUSPENDED
+  REMOVED
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  REVOKED
+}
+
+enum ProductStatus {
+  ACTIVE
+  ARCHIVED
+}
+
+enum StockMovementType {
+  OPENING
+  RECEIPT
+  SALE
+  SALE_REVERSAL
+  ADJUSTMENT_IN
+  ADJUSTMENT_OUT
+  DAMAGED
+}
+
+enum SaleStatus {
+  COMPLETED
+  REVERSED
+}
+
+enum PaymentKind {
+  SALE_PAYMENT
+  REPAYMENT
+}
+
+enum PaymentMethod {
+  CASH
+  TRANSFER
+}
+
+// Mirrors section 8.5 of the guide.
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  PAID
+  FAILED
+  EXPIRED
+  REVERSED
+  REFUNDED
+  UNDER_REVIEW
+}
+
+enum ReceivableStatus {
+  OPEN
+  PARTIAL
+  SETTLED
+  VOIDED
+}
+
+enum ExpenseStatus {
+  POSTED
+  REVERSED
+}
+
+enum AccountType {
+  ASSET
+  LIABILITY
+  EQUITY
+  REVENUE
+  COST_OF_SALES
+  EXPENSE
+}
+
+enum EntityStatus {
+  ACTIVE
+  ARCHIVED
+}
+
+// Mirrors section 9.3 of the guide (server side states only).
+enum SyncStatus {
+  SYNCED
+  CONFLICT
+  FAILED_RETRYABLE
+  FAILED_FINAL
+  DISMISSED
+}
+
+// ───────────────────────── Identity and tenancy ─────────────────────────
+
+model User {
+  id          String    @id @default(uuid()) @db.Uuid
+  phone       String    @unique // E.164, for example +2348012345678
+  name        String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  lastLoginAt DateTime?
+
+  memberships   BusinessMember[]
+  refreshTokens RefreshToken[]
+
+  @@map("users")
+}
+
+model OtpChallenge {
+  id         String    @id @default(uuid()) @db.Uuid
+  phone      String
+  codeHash   String
+  expiresAt  DateTime
+  attempts   Int       @default(0)
+  consumedAt DateTime?
+  ip         String?
+  createdAt  DateTime  @default(now())
+
+  @@index([phone, createdAt])
+  @@index([expiresAt])
+  @@map("otp_challenges")
+}
+
+model RefreshToken {
+  id           String    @id @default(uuid()) @db.Uuid
+  userId       String    @db.Uuid
+  familyId     String    @db.Uuid // one family per login session
+  tokenHash    String    @unique
+  expiresAt    DateTime
+  revokedAt    DateTime?
+  replacedById String?   @db.Uuid
+  deviceName   String?
+  userAgent    String?
+  ip           String?
+  createdAt    DateTime  @default(now())
+  lastUsedAt   DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([familyId])
+  @@index([expiresAt])
+  @@map("refresh_tokens")
+}
+
+model Business {
+  id                String   @id @default(uuid()) @db.Uuid
+  name              String
+  category          String
+  phone             String?
+  email             String?
+  address           String?
+  city              String?
+  state             String?
+  currency          String   @default("NGN")
+  timezone          String   @default("Africa/Lagos")
+  lastReceiptNumber Int      @default(0)
+  createdById       String   @db.Uuid
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  members           BusinessMember[]
+  invitations       Invitation[]
+  categories        Category[]
+  products          Product[]
+  customers         Customer[]
+  sales             Sale[]
+  expenses          Expense[]
+  expenseCategories ExpenseCategory[]
+  accounts          Account[]
+
+  @@map("businesses")
+}
+
+model BusinessMember {
+  id                 String       @id @default(uuid()) @db.Uuid
+  businessId         String       @db.Uuid
+  userId             String       @db.Uuid
+  role               MemberRole
+  status             MemberStatus @default(ACTIVE)
+  // The permission matrix: role defaults plus per member refinements.
+  extraPermissions   String[]     @default([])
+  revokedPermissions String[]     @default([])
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([businessId, userId])
+  @@index([userId])
+  @@map("business_members")
+}
+
+model Invitation {
+  id               String           @id @default(uuid()) @db.Uuid
+  businessId       String           @db.Uuid
+  phone            String
+  role             MemberRole
+  tokenHash        String           @unique
+  status           InvitationStatus @default(PENDING)
+  expiresAt        DateTime
+  invitedById      String           @db.Uuid
+  acceptedByUserId String?          @db.Uuid
+  acceptedAt       DateTime?
+  createdAt        DateTime         @default(now())
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([businessId, status])
+  @@index([phone])
+  @@map("invitations")
+}
+
+// ───────────────────────────── Catalogue ─────────────────────────────
+
+model Category {
+  id         String   @id @default(uuid()) @db.Uuid
+  businessId String   @db.Uuid
+  name       String
+  createdAt  DateTime @default(now())
+
+  business Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  products Product[]
+
+  @@unique([businessId, name])
+  @@map("categories")
+}
+
+model Product {
+  id               String        @id @default(uuid()) @db.Uuid
+  businessId       String        @db.Uuid
+  categoryId       String?       @db.Uuid
+  name             String
+  sku              String?
+  barcode          String?
+  baseUnit         String // the unit stock is counted in, for example piece, kg, bottle
+  sellingPriceKobo BigInt // price per base unit
+  reorderThreshold Decimal       @default(0) @db.Decimal(18, 4)
+  status           ProductStatus @default(ACTIVE)
+  createdById      String        @db.Uuid
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  archivedAt       DateTime?
+
+  business    Business         @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  category    Category?        @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  conversions UnitConversion[]
+  balance     StockBalance?
+  movements   StockMovement[]
+  saleItems   SaleItem[]
+
+  @@unique([businessId, sku])
+  @@index([businessId, status])
+  @@index([businessId, name])
+  @@index([businessId, barcode])
+  @@map("products")
+}
+
+// A business defined conversion, for example 1 carton = 12 piece.
+// Conversions are immutable. Changing one archives it and creates a new row,
+// and every sale item snapshots the factor it used.
+model UnitConversion {
+  id               String    @id @default(uuid()) @db.Uuid
+  businessId       String    @db.Uuid
+  productId        String    @db.Uuid
+  name             String
+  factor           Decimal   @db.Decimal(18, 6) // base units per one of this unit
+  sellingPriceKobo BigInt? // optional explicit price per one of this unit
+  createdAt        DateTime  @default(now())
+  archivedAt       DateTime?
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@map("unit_conversions")
+}
+
+// ───────────────────────────── Inventory ─────────────────────────────
+
+// Current quantity and weighted average cost. Always changed together with an
+// append only StockMovement inside one transaction, under a row lock.
+model StockBalance {
+  productId   String   @id @db.Uuid
+  businessId  String   @db.Uuid
+  quantity    Decimal  @default(0) @db.Decimal(18, 4)
+  avgCostKobo Decimal  @default(0) @db.Decimal(20, 4) // kobo per base unit
+  updatedAt   DateTime @updatedAt
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([businessId])
+  @@map("stock_balances")
+}
+
+model StockMovement {
+  id            String            @id @default(uuid()) @db.Uuid
+  businessId    String            @db.Uuid
+  productId     String            @db.Uuid
+  type          StockMovementType
+  quantityDelta Decimal           @db.Decimal(18, 4) // base units, signed
+  unitCostKobo  Decimal           @db.Decimal(20, 4) // kobo per base unit used for this movement
+  balanceAfter  Decimal           @db.Decimal(18, 4)
+  reasonCode    String?
+  note          String?
+  sourceType    String?
+  sourceId      String?
+  occurredAt    DateTime
+  createdById   String            @db.Uuid
+  createdAt     DateTime          @default(now())
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  @@index([businessId, createdAt])
+  @@index([productId, createdAt])
+  @@index([sourceType, sourceId])
+  @@map("stock_movements")
+}
+
+// ───────────────────────────── Customers ─────────────────────────────
+
+model Customer {
+  id          String       @id @default(uuid()) @db.Uuid
+  businessId  String       @db.Uuid
+  name        String
+  phone       String?
+  notes       String?
+  status      EntityStatus @default(ACTIVE)
+  createdById String       @db.Uuid
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  business    Business     @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  sales       Sale[]
+  receivables Receivable[]
+
+  @@index([businessId, name])
+  @@index([businessId, phone])
+  @@map("customers")
+}
+
+// ───────────────────────────── Sales ─────────────────────────────
+
+model Sale {
+  id            String     @id @db.Uuid // client generated UUID so offline retries are safe
+  businessId    String     @db.Uuid
+  receiptNumber String // human readable, unique per business, for example R-000042
+  customerId    String?    @db.Uuid
+  cashierId     String     @db.Uuid
+  status        SaleStatus @default(COMPLETED)
+  subtotalKobo  BigInt // sum of line totals before line discounts
+  discountKobo  BigInt     @default(0)
+  totalKobo     BigInt // revenue recognised: subtotal minus discounts
+  creditKobo    BigInt     @default(0) // part of the total left on the customer account
+  currency      String     @default("NGN")
+  dueDate       DateTime?
+  note          String?
+  occurredAt    DateTime
+  createdAt     DateTime   @default(now())
+
+  business   Business      @relation(fields: [businessId], references: [id], onDelete: Restrict)
+  customer   Customer?     @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  items      SaleItem[]
+  payments   Payment[]
+  receivable Receivable?
+  reversal   SaleReversal?
+
+  @@unique([businessId, receiptNumber])
+  @@index([businessId, occurredAt])
+  @@index([businessId, customerId])
+  @@index([businessId, cashierId])
+  @@index([businessId, status])
+  @@map("sales")
+}
+
+// Immutable snapshot of what was sold, at what price and at what cost.
+model SaleItem {
+  id             String   @id @default(uuid()) @db.Uuid
+  saleId         String   @db.Uuid
+  businessId     String   @db.Uuid
+  productId      String?  @db.Uuid
+  productName    String
+  sku            String?
+  unitName       String
+  unitFactor     Decimal  @db.Decimal(18, 6)
+  quantity       Decimal  @db.Decimal(18, 4) // in the sold unit
+  baseQuantity   Decimal  @db.Decimal(18, 4) // quantity converted to the base unit
+  listPriceKobo  BigInt // catalogue price per sold unit at sale time
+  unitPriceKobo  BigInt // price actually charged per sold unit
+  discountKobo   BigInt   @default(0)
+  lineTotalKobo  BigInt // round(quantity x unitPrice) minus discount
+  unitCostKobo   Decimal  @db.Decimal(20, 4) // weighted average cost per base unit at sale time
+  cogsKobo       BigInt
+  overrideReason String?
+  createdAt      DateTime @default(now())
+
+  sale    Sale     @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  product Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+  @@index([saleId])
+  @@index([businessId, productId])
+  @@map("sale_items")
+}
+
+model SaleReversal {
+  id          String   @id @default(uuid()) @db.Uuid
+  saleId      String   @unique @db.Uuid
+  businessId  String   @db.Uuid
+  reason      String
+  createdById String   @db.Uuid
+  createdAt   DateTime @default(now())
+
+  sale Sale @relation(fields: [saleId], references: [id], onDelete: Restrict)
+
+  @@map("sale_reversals")
+}
+
+// ───────────────────────────── Payments and receivables ─────────────────────────────
+
+model Payment {
+  id          String        @id @default(uuid()) @db.Uuid
+  businessId  String        @db.Uuid
+  kind        PaymentKind
+  saleId      String?       @db.Uuid
+  customerId  String?       @db.Uuid
+  method      PaymentMethod
+  status      PaymentStatus
+  amountKobo  BigInt
+  currency    String        @default("NGN")
+  note        String?
+  occurredAt  DateTime
+  createdById String        @db.Uuid
+  createdAt   DateTime      @default(now())
+
+  sale        Sale?               @relation(fields: [saleId], references: [id], onDelete: Restrict)
+  allocations PaymentAllocation[]
+
+  @@index([businessId, occurredAt])
+  @@index([businessId, status])
+  @@index([saleId])
+  @@index([customerId])
+  @@map("payments")
+}
+
+model PaymentAllocation {
+  id           String   @id @default(uuid()) @db.Uuid
+  businessId   String   @db.Uuid
+  paymentId    String   @db.Uuid
+  receivableId String   @db.Uuid
+  amountKobo   BigInt
+  createdAt    DateTime @default(now())
+
+  payment    Payment    @relation(fields: [paymentId], references: [id], onDelete: Restrict)
+  receivable Receivable @relation(fields: [receivableId], references: [id], onDelete: Restrict)
+
+  @@index([receivableId])
+  @@index([paymentId])
+  @@map("payment_allocations")
+}
+
+// The Iwe Gbese record for one credit sale. outstandingKobo is maintained under
+// a row lock together with the allocations, and a CHECK keeps it within range.
+model Receivable {
+  id              String           @id @default(uuid()) @db.Uuid
+  businessId      String           @db.Uuid
+  customerId      String           @db.Uuid
+  saleId          String           @unique @db.Uuid
+  originalKobo    BigInt
+  outstandingKobo BigInt
+  dueDate         DateTime?
+  status          ReceivableStatus @default(OPEN)
+  voidedAt        DateTime?
+  createdAt       DateTime         @default(now())
+
+  customer    Customer            @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  sale        Sale                @relation(fields: [saleId], references: [id], onDelete: Restrict)
+  allocations PaymentAllocation[]
+
+  @@index([businessId, customerId, status])
+  @@index([businessId, dueDate])
+  @@map("receivables")
+}
+
+// ───────────────────────────── Expenses ─────────────────────────────
+
+model ExpenseCategory {
+  id         String    @id @default(uuid()) @db.Uuid
+  businessId String    @db.Uuid
+  name       String
+  accountId  String    @db.Uuid
+  createdAt  DateTime  @default(now())
+  archivedAt DateTime?
+
+  business Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  account  Account   @relation(fields: [accountId], references: [id], onDelete: Restrict)
+  expenses Expense[]
+
+  @@unique([businessId, name])
+  @@map("expense_categories")
+}
+
+model Expense {
+  id             String        @id @db.Uuid // client generated UUID
+  businessId     String        @db.Uuid
+  categoryId     String        @db.Uuid
+  amountKobo     BigInt
+  currency       String        @default("NGN")
+  method         PaymentMethod
+  expenseDate    DateTime
+  description    String
+  status         ExpenseStatus @default(POSTED)
+  reversalReason String?
+  reversedAt     DateTime?
+  reversedById   String?       @db.Uuid
+  createdById    String        @db.Uuid
+  createdAt      DateTime      @default(now())
+
+  business Business        @relation(fields: [businessId], references: [id], onDelete: Restrict)
+  category ExpenseCategory @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  @@index([businessId, expenseDate])
+  @@index([businessId, categoryId])
+  @@map("expenses")
+}
+
+// ───────────────────────────── Accounting ─────────────────────────────
+
+model Account {
+  id         String      @id @default(uuid()) @db.Uuid
+  businessId String      @db.Uuid
+  code       String
+  name       String
+  type       AccountType
+  systemKey  String? // stable key for built in accounts, for example CASH or SALES_REVENUE
+  createdAt  DateTime    @default(now())
+
+  business          Business          @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  lines             JournalLine[]
+  expenseCategories ExpenseCategory[]
+
+  @@unique([businessId, code])
+  @@unique([businessId, systemKey])
+  @@map("accounts")
+}
+
+model JournalEntry {
+  id              String   @id @default(uuid()) @db.Uuid
+  businessId      String   @db.Uuid
+  entryDate       DateTime
+  memo            String
+  sourceType      String
+  sourceId        String
+  reversesEntryId String?  @unique @db.Uuid
+  reason          String?
+  currency        String   @default("NGN")
+  createdById     String   @db.Uuid
+  createdAt       DateTime @default(now())
+
+  lines JournalLine[]
+
+  @@index([businessId, entryDate])
+  @@index([sourceType, sourceId])
+  @@map("journal_entries")
+}
+
+model JournalLine {
+  id         String @id @default(uuid()) @db.Uuid
+  entryId    String @db.Uuid
+  businessId String @db.Uuid
+  accountId  String @db.Uuid
+  debitKobo  BigInt @default(0)
+  creditKobo BigInt @default(0)
+
+  entry   JournalEntry @relation(fields: [entryId], references: [id], onDelete: Restrict)
+  account Account      @relation(fields: [accountId], references: [id], onDelete: Restrict)
+
+  @@index([entryId])
+  @@index([businessId, accountId])
+  @@map("journal_lines")
+}
+
+// ───────────────────────────── Reliability ─────────────────────────────
+
+model AuditLog {
+  id          String   @id @default(uuid()) @db.Uuid
+  businessId  String?  @db.Uuid
+  actorUserId String?  @db.Uuid
+  action      String
+  entityType  String
+  entityId    String
+  reason      String?
+  before      Json?
+  after       Json?
+  requestId   String?
+  ip          String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+
+  @@index([businessId, createdAt])
+  @@index([entityType, entityId])
+  @@index([actorUserId, createdAt])
+  @@map("audit_logs")
+}
+
+model IdempotencyRecord {
+  id             String    @id @default(uuid()) @db.Uuid
+  businessId     String    @db.Uuid
+  userId         String    @db.Uuid
+  scope          String // the operation, for example sales.create
+  key            String
+  requestHash    String
+  responseStatus Int?
+  responseBody   Json?
+  createdAt      DateTime  @default(now())
+  completedAt    DateTime?
+
+  @@unique([businessId, userId, scope, key])
+  @@index([createdAt])
+  @@map("idempotency_records")
+}
+
+// Every operation received through /sync/operations is kept, including conflicts,
+// so a rejected offline transaction is never silently discarded.
+model SyncOperation {
+  id              String     @id @db.Uuid // client generated operation id
+  businessId      String     @db.Uuid
+  userId          String     @db.Uuid
+  type            String
+  payload         Json
+  status          SyncStatus
+  errorCode       String?
+  errorMessage    String?
+  result          Json?
+  deviceId        String?
+  clientCreatedAt DateTime
+  receivedAt      DateTime   @default(now())
+  attempts        Int        @default(1)
+  resolvedAt      DateTime?
+  resolvedById    String?    @db.Uuid
+  resolutionNote  String?
+
+  @@index([businessId, status])
+  @@index([businessId, userId, receivedAt])
+  @@map("sync_operations")
+}
