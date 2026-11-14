@@ -38,9 +38,13 @@ export class OtpService {
     if (recent[0]) {
       const waited = (now.getTime() - recent[0].createdAt.getTime()) / 1000;
       if (waited < OTP_RESEND_SECONDS) {
-        throw tooManyRequests('OTP_RESEND_TOO_SOON', 'Wait a moment before requesting another code.', {
-          retryAfterSeconds: Math.ceil(OTP_RESEND_SECONDS - waited),
-        });
+        throw tooManyRequests(
+          'OTP_RESEND_TOO_SOON',
+          'Wait a moment before requesting another code.',
+          {
+            retryAfterSeconds: Math.ceil(OTP_RESEND_SECONDS - waited),
+          },
+        );
       }
     }
 
@@ -81,7 +85,10 @@ export class OtpService {
         where: { id: challenge.id },
         data: { consumedAt: new Date() },
       });
-      throw tooManyRequests('OTP_ATTEMPTS_EXCEEDED', 'Too many incorrect attempts. Request a new code.');
+      throw tooManyRequests(
+        'OTP_ATTEMPTS_EXCEEDED',
+        'Too many incorrect attempts. Request a new code.',
+      );
     }
 
     const expected = Buffer.from(challenge.codeHash, 'hex');

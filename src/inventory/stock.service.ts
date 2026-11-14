@@ -31,28 +31,53 @@ interface MovementBase {
 @Injectable()
 export class StockService {
   /** Lock balance rows for update, in product id order. Call once at the start of a transaction. */
-  async lock(tx: Prisma.TransactionClient, businessId: string, productIds: string[]): Promise<Map<string, StockPosition>> {
+  async lock(
+    tx: Prisma.TransactionClient,
+    businessId: string,
+    productIds: string[],
+  ): Promise<Map<string, StockPosition>> {
     const ids = [...new Set(productIds)].sort();
-    const rows = await tx.$queryRaw<{ productId: string; quantity: Prisma.Decimal; avgCostKobo: Prisma.Decimal }[]>`
+    const rows = await tx.$queryRaw<
+      { productId: string; quantity: Prisma.Decimal; avgCostKobo: Prisma.Decimal }[]
+    >`
       SELECT "productId", quantity, "avgCostKobo"
       FROM stock_balances
       WHERE "businessId" = ${businessId}::uuid AND "productId" = ANY(${ids}::uuid[])
       ORDER BY "productId"
       FOR UPDATE`;
     if (rows.length !== ids.length) throw notFound('Product');
-    return new Map(rows.map((r) => [r.productId, { quantity: D(r.quantity), avgCostKobo: D(r.avgCostKobo) }]));
+    return new Map(
+      rows.map((r) => [r.productId, { quantity: D(r.quantity), avgCostKobo: D(r.avgCostKobo) }]),
+    );
   }
 
   /** Adds stock at a known cost per base unit and blends the weighted average. */
   async receive(
     tx: Prisma.TransactionClient,
     positions: Map<string, StockPosition>,
-    args: MovementBase & { type: 'OPENING' | 'RECEIPT' | 'SALE_REVERSAL' | 'ADJUSTMENT_IN'; baseQuantity: Decimal; unitCostKobo: Decimal },
+    args: MovementBase & {
+      type: 'OPENING' | 'RECEIPT' | 'SALE_REVERSAL' | 'ADJUSTMENT_IN';
+      baseQuantity: Decimal;
+      unitCostKobo: Decimal;
+    },
   ): Promise<StockPosition> {
     const pos = this.position(positions, args.productId);
     const quantity = pos.quantity.add(args.baseQuantity);
-    const avgCostKobo = blendAverageCost(pos.quantity, pos.avgCostKobo, args.baseQuantity, args.unitCostKobo);
-    return this.write(tx, positions, args, quantity, avgCostKobo, args.baseQuantity, args.unitCostKobo);
+    const avgCostKobo = blendAverageCost(
+      pos.quantity,
+      pos.avgCostKobo,
+      args.baseQuantity,
+      args.unitCostKobo,
+    );
+    return this.write(
+      tx,
+      positions,
+      args,
+      quantity,
+      avgCostKobo,
+      args.baseQuantity,
+      args.unitCostKobo,
+    );
   }
 
   /**
@@ -62,16 +87,24 @@ export class StockService {
   async issue(
     tx: Prisma.TransactionClient,
     positions: Map<string, StockPosition>,
-    args: MovementBase & { type: 'SALE' | 'ADJUSTMENT_OUT' | 'DAMAGED'; baseQuantity: Decimal; productName?: string },
+    args: MovementBase & {
+      type: 'SALE' | 'ADJUSTMENT_OUT' | 'DAMAGED';
+      baseQuantity: Decimal;
+      productName?: string;
+    },
   ): Promise<{ position: StockPosition; unitCostKobo: Decimal }> {
     const pos = this.position(positions, args.productId);
     if (pos.quantity.lt(args.baseQuantity)) {
-      throw conflict('INSUFFICIENT_STOCK', `Not enough stock${args.productName ? ` for ${args.productName}` : ''}.`, {
-        productId: args.productId,
-        productName: args.productName,
-        available: qtyToString(pos.quantity),
-        requested: qtyToString(args.baseQuantity),
-      });
+      throw conflict(
+        'INSUFFICIENT_STOCK',
+        `Not enough stock${args.productName ? ` for ${args.productName}` : ''}.`,
+        {
+          productId: args.productId,
+          productName: args.productName,
+          available: qtyToString(pos.quantity),
+          requested: qtyToString(args.baseQuantity),
+        },
+      );
     }
     const unitCostKobo = pos.avgCostKobo;
     const position = await this.write(

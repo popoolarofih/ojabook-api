@@ -23,14 +23,15 @@ async function bootstrap() {
   const config = app.get<AppConfig>(APP_CONFIG);
 
   const document = SwaggerModule.createDocument(app, buildOpenApiConfig());
-  SwaggerModule.setup(`${API_PREFIX}/docs`, app, document, { jsonDocumentUrl: `${API_PREFIX}/openapi.json` });
+  SwaggerModule.setup(`${API_PREFIX}/docs`, app, document, {
+    jsonDocumentUrl: `${API_PREFIX}/openapi.json`,
+  });
 
   await app.listen(config.port, '0.0.0.0');
 }
 
 if (require.main === module) {
   bootstrap().catch((err) => {
-    // eslint-disable-next-line no-console
     console.error(err);
     process.exit(1);
   });

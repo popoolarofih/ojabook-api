@@ -52,13 +52,20 @@ export class LedgerService {
   /** Creates an expense category together with its own ledger account (codes 6000 to 6890). */
   async createExpenseCategory(tx: Prisma.TransactionClient, businessId: string, name: string) {
     const last = await tx.account.findFirst({
-      where: { businessId, type: 'EXPENSE', code: { gte: String(EXPENSE_ACCOUNT_CODE_START), lt: '6900' } },
+      where: {
+        businessId,
+        type: 'EXPENSE',
+        code: { gte: String(EXPENSE_ACCOUNT_CODE_START), lt: '6900' },
+      },
       orderBy: { code: 'desc' },
       select: { code: true },
     });
     const next = last ? Number(last.code) + 10 : EXPENSE_ACCOUNT_CODE_START;
     if (next >= 6900) {
-      throw unprocessable('TOO_MANY_EXPENSE_CATEGORIES', 'This business has reached the expense category limit.');
+      throw unprocessable(
+        'TOO_MANY_EXPENSE_CATEGORIES',
+        'This business has reached the expense category limit.',
+      );
     }
     const account = await tx.account.create({
       data: { businessId, code: String(next), name, type: 'EXPENSE' },
@@ -79,7 +86,8 @@ export class LedgerService {
       string
     >;
     for (const key of Object.keys(SYSTEM_ACCOUNTS) as SystemAccountKey[]) {
-      if (!map[key]) throw conflict('CHART_NOT_SEEDED', `Account ${key} is missing for this business.`);
+      if (!map[key])
+        throw conflict('CHART_NOT_SEEDED', `Account ${key} is missing for this business.`);
     }
     return map;
   }

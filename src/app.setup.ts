@@ -21,7 +21,14 @@ export function configureApp(app: INestApplication, opts: { useLogger?: boolean 
     origin: config.webOrigins,
     credentials: true,
     methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Business-Id', 'Idempotency-Key', 'X-Requested-With', 'X-Request-Id'],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'X-Business-Id',
+      'Idempotency-Key',
+      'X-Requested-With',
+      'X-Request-Id',
+    ],
     exposedHeaders: ['X-Request-Id', 'Idempotent-Replayed'],
   });
   app.setGlobalPrefix(API_PREFIX);

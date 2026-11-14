@@ -1,4 +1,15 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, ParseUUIDPipe, Patch, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SkipThrottle } from '@nestjs/throttler';
 import { TenantMember } from '../auth/auth.types';
@@ -24,7 +35,10 @@ import { BusinessesService } from './businesses.service';
 /** Routes that carry :id must match the active business from X-Business-Id. */
 function assertActive(member: TenantMember, id: string) {
   if (member.businessId !== id) {
-    throw forbidden('BUSINESS_MISMATCH', 'The business in the path does not match the active business.');
+    throw forbidden(
+      'BUSINESS_MISMATCH',
+      'The business in the path does not match the active business.',
+    );
   }
 }
 
@@ -38,7 +52,11 @@ export class BusinessesController {
   @ApiOperation({ summary: 'Business types with onboarding suggestions' })
   @ApiOkResponse({ type: [BusinessCategoryDto] })
   categories(): BusinessCategoryDto[] {
-    return BUSINESS_CATEGORIES.map((c) => ({ id: c.id, label: c.label, suggestedUnits: [...c.suggestedUnits] }));
+    return BUSINESS_CATEGORIES.map((c) => ({
+      id: c.id,
+      label: c.label,
+      suggestedUnits: [...c.suggestedUnits],
+    }));
   }
 
   @Post('businesses')
@@ -56,7 +74,9 @@ export class BusinessesController {
 
   @Post('invitations/accept')
   @HttpCode(200)
-  @ApiOperation({ summary: 'Accept a staff invitation. Must be signed in with the invited phone number.' })
+  @ApiOperation({
+    summary: 'Accept a staff invitation. Must be signed in with the invited phone number.',
+  })
   @ApiOkResponse({ type: BusinessDto })
   accept(@CurrentUser() user: AuthUser, @Body() dto: AcceptInvitationDto): Promise<BusinessDto> {
     return this.service.acceptInvitation(user.id, dto.token);
@@ -66,7 +86,10 @@ export class BusinessesController {
   @RequirePermissions('business.read')
   @Get('businesses/:id')
   @ApiOkResponse({ type: BusinessDto })
-  get(@CurrentMember() m: TenantMember, @Param('id', ParseUUIDPipe) id: string): Promise<BusinessDto> {
+  get(
+    @CurrentMember() m: TenantMember,
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<BusinessDto> {
     assertActive(m, id);
     return this.service.get(m);
   }
@@ -88,7 +111,10 @@ export class BusinessesController {
   @RequirePermissions('members.read')
   @Get('businesses/:id/members')
   @ApiOkResponse({ type: [MemberDto] })
-  members(@CurrentMember() m: TenantMember, @Param('id', ParseUUIDPipe) id: string): Promise<MemberDto[]> {
+  members(
+    @CurrentMember() m: TenantMember,
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<MemberDto[]> {
     assertActive(m, id);
     return this.service.listMembers(m);
   }
@@ -110,7 +136,10 @@ export class BusinessesController {
   @RequirePermissions('members.read')
   @Get('businesses/:id/invitations')
   @ApiOkResponse({ type: [InvitationDto] })
-  invitations(@CurrentMember() m: TenantMember, @Param('id', ParseUUIDPipe) id: string): Promise<InvitationDto[]> {
+  invitations(
+    @CurrentMember() m: TenantMember,
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<InvitationDto[]> {
     assertActive(m, id);
     return this.service.listInvitations(m);
   }

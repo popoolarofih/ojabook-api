@@ -1,5 +1,25 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, ParseUUIDPipe, Patch, Post, Req, Res, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiCookieAuth, ApiNoContentResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiCookieAuth,
+  ApiNoContentResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { CookieOptions, Request, Response } from 'express';
 import { unauthorized } from '../common/errors';
@@ -80,7 +100,11 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ): Promise<AuthResponse> {
-    const { session, me } = await this.auth.verifyOtp(dto.phone, dto.code, this.meta(req, dto.deviceName));
+    const { session, me } = await this.auth.verifyOtp(
+      dto.phone,
+      dto.code,
+      this.meta(req, dto.deviceName),
+    );
     this.setRefreshCookie(res, session);
     return { ...me, accessToken: session.accessToken, expiresInSeconds: session.expiresInSeconds };
   }
@@ -93,7 +117,10 @@ export class AuthController {
   @ApiCookieAuth()
   @ApiOperation({ summary: 'Rotate the refresh cookie and get a new access token' })
   @ApiOkResponse({ type: RefreshResponse })
-  async refresh(@Req() req: Request, @Res({ passthrough: true }) res: Response): Promise<RefreshResponse> {
+  async refresh(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<RefreshResponse> {
     const raw = (req.cookies as Record<string, string> | undefined)?.[REFRESH_COOKIE];
     if (!raw) throw unauthorized('REFRESH_MISSING', 'Sign in to continue.');
     try {
@@ -121,7 +148,10 @@ export class AuthController {
   @Post('logout-all')
   @HttpCode(204)
   @ApiOperation({ summary: 'Sign out of every device' })
-  async logoutAll(@CurrentUser() user: AuthUser, @Res({ passthrough: true }) res: Response): Promise<void> {
+  async logoutAll(
+    @CurrentUser() user: AuthUser,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<void> {
     await this.sessions.revokeAllForUser(user.id);
     res.clearCookie(REFRESH_COOKIE, this.cookieOptions());
   }
@@ -136,7 +166,10 @@ export class AuthController {
   @ApiBearerAuth()
   @Delete('sessions/:id')
   @HttpCode(204)
-  async revokeSession(@CurrentUser() user: AuthUser, @Param('id', ParseUUIDPipe) id: string): Promise<void> {
+  async revokeSession(
+    @CurrentUser() user: AuthUser,
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<void> {
     await this.sessions.revokeOwnSession(user.id, id);
   }
 

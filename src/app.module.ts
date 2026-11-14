@@ -9,6 +9,10 @@ import { AuthModule } from './auth/auth.module';
 import { BusinessesModule } from './businesses/businesses.module';
 import { CatalogueModule } from './catalogue/catalogue.module';
 import { CustomersModule } from './customers/customers.module';
+import { ExpensesModule } from './expenses/expenses.module';
+import { ReportsModule } from './reports/reports.module';
+import { JobsModule } from './jobs/jobs.module';
+import { SyncModule } from './sync/sync.module';
 import { ConfigModule } from './config/config.module';
 import { APP_CONFIG, AppConfig, loadConfig } from './config/env';
 import { HealthController } from './health/health.controller';
@@ -34,8 +38,15 @@ import { PrismaModule } from './prisma/prisma.module';
             return id;
           },
           // Never log credentials or one time codes.
-          redact: ['req.headers.authorization', 'req.headers.cookie', 'res.headers["set-cookie"]', 'req.body.code'],
-          transport: config.isProduction ? undefined : { target: 'pino-pretty', options: { singleLine: true } },
+          redact: [
+            'req.headers.authorization',
+            'req.headers.cookie',
+            'res.headers["set-cookie"]',
+            'req.body.code',
+          ],
+          transport: config.isProduction
+            ? undefined
+            : { target: 'pino-pretty', options: { singleLine: true } },
         },
       }),
     }),
@@ -56,6 +67,10 @@ import { PrismaModule } from './prisma/prisma.module';
     CatalogueModule,
     SalesModule,
     CustomersModule,
+    ExpensesModule,
+    ReportsModule,
+    SyncModule,
+    JobsModule,
   ],
   controllers: [HealthController],
   providers: [

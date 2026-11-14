@@ -30,7 +30,10 @@ export class CreateBusinessDto {
   @ApiPropertyOptional() @IsOptional() @IsString() @MaxLength(80) city?: string;
   @ApiPropertyOptional() @IsOptional() @IsString() @MaxLength(80) state?: string;
 
-  @ApiPropertyOptional({ default: 'Africa/Lagos', description: 'IANA timezone. Stored per business.' })
+  @ApiPropertyOptional({
+    default: 'Africa/Lagos',
+    description: 'IANA timezone. Stored per business.',
+  })
   @IsOptional()
   @IsString()
   @MaxLength(60)
@@ -44,7 +47,10 @@ export class CreateBusinessDto {
 
 export class UpdateBusinessDto {
   @ApiPropertyOptional() @IsOptional() @IsString() @Length(2, 80) name?: string;
-  @ApiPropertyOptional({ enum: BUSINESS_CATEGORY_IDS }) @IsOptional() @IsIn(BUSINESS_CATEGORY_IDS) category?: string;
+  @ApiPropertyOptional({ enum: BUSINESS_CATEGORY_IDS })
+  @IsOptional()
+  @IsIn(BUSINESS_CATEGORY_IDS)
+  category?: string;
   @ApiPropertyOptional() @IsOptional() @IsString() @MaxLength(25) phone?: string;
   @ApiPropertyOptional() @IsOptional() @IsEmail() @MaxLength(120) email?: string;
   @ApiPropertyOptional() @IsOptional() @IsString() @MaxLength(200) address?: string;
@@ -88,7 +94,9 @@ export class InvitationDto {
 }
 
 export class CreatedInvitationDto extends InvitationDto {
-  @ApiProperty({ description: 'Shown once. Share it with the invited person. It is stored only as a hash.' })
+  @ApiProperty({
+    description: 'Shown once. Share it with the invited person. It is stored only as a hash.',
+  })
   token: string;
 }
 

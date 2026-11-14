@@ -15,7 +15,8 @@ import {
 } from './inventory.dto';
 import { InventoryService } from './inventory.service';
 
-const IdemHeader = () => ApiHeader({ name: 'Idempotency-Key', required: true, description: 'Makes retries safe.' });
+const IdemHeader = () =>
+  ApiHeader({ name: 'Idempotency-Key', required: true, description: 'Makes retries safe.' });
 
 @ApiTags('inventory')
 @Tenant()

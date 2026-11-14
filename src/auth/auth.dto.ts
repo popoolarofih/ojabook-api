@@ -2,7 +2,10 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsOptional, IsString, Length, Matches, MaxLength } from 'class-validator';
 
 export class OtpRequestDto {
-  @ApiProperty({ example: '0801 234 5678', description: 'Nigerian mobile number in any common format.' })
+  @ApiProperty({
+    example: '0801 234 5678',
+    description: 'Nigerian mobile number in any common format.',
+  })
   @IsString()
   @MaxLength(25)
   phone: string;

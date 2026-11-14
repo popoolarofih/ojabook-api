@@ -6,10 +6,16 @@ import { IDEMPOTENCY_KEY_PATTERN, IdempotentResult } from '../idempotency/idempo
 export function idempotencyKey(req: Request): string {
   const key = req.headers['idempotency-key'];
   if (typeof key !== 'string' || key.length === 0) {
-    throw badRequest('IDEMPOTENCY_KEY_REQUIRED', 'Send an Idempotency-Key header with this request.');
+    throw badRequest(
+      'IDEMPOTENCY_KEY_REQUIRED',
+      'Send an Idempotency-Key header with this request.',
+    );
   }
   if (!IDEMPOTENCY_KEY_PATTERN.test(key)) {
-    throw badRequest('IDEMPOTENCY_KEY_INVALID', 'The Idempotency-Key must be 8 to 128 letters, digits, or . _ : characters.');
+    throw badRequest(
+      'IDEMPOTENCY_KEY_INVALID',
+      'The Idempotency-Key must be 8 to 128 letters, digits, or . _ : characters.',
+    );
   }
   return key;
 }

@@ -12,8 +12,15 @@ export function parseClientTime(value: string | undefined, label = 'time'): Date
   if (!value) return new Date();
   const d = new Date(value);
   const now = Date.now();
-  if (Number.isNaN(d.getTime()) || d.getTime() > now + MAX_FUTURE_MS || d.getTime() < now - MAX_BACKDATE_DAYS * 86_400_000) {
-    throw badRequest('INVALID_OCCURRED_AT', `The ${label} must not be in the future or older than ${MAX_BACKDATE_DAYS} days.`);
+  if (
+    Number.isNaN(d.getTime()) ||
+    d.getTime() > now + MAX_FUTURE_MS ||
+    d.getTime() < now - MAX_BACKDATE_DAYS * 86_400_000
+  ) {
+    throw badRequest(
+      'INVALID_OCCURRED_AT',
+      `The ${label} must not be in the future or older than ${MAX_BACKDATE_DAYS} days.`,
+    );
   }
   return d;
 }

@@ -34,11 +34,20 @@ import { SessionService } from './session.service';
       inject: [APP_CONFIG, ConsoleOtpSender],
       useFactory: (config: AppConfig, consoleSender: ConsoleOtpSender) => {
         if (config.otpProvider === 'console') return consoleSender;
-        throw new Error(`Unknown OTP_PROVIDER "${config.otpProvider}". No adapter is implemented yet.`);
+        throw new Error(
+          `Unknown OTP_PROVIDER "${config.otpProvider}". No adapter is implemented yet.`,
+        );
       },
     },
     { provide: APP_GUARD, useClass: JwtAuthGuard },
   ],
-  exports: [AuthService, SessionService, BusinessGuard, PermissionsGuard, ConsoleOtpSender, JwtModule],
+  exports: [
+    AuthService,
+    SessionService,
+    BusinessGuard,
+    PermissionsGuard,
+    ConsoleOtpSender,
+    JwtModule,
+  ],
 })
 export class AuthModule {}

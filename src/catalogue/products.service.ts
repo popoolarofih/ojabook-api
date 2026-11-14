@@ -48,14 +48,12 @@ export function toProductDto(p: ProductRow, canSeeCost: boolean): ProductDto {
     status: p.status,
     quantity: qtyToString(quantity),
     isLowStock: p.status === 'ACTIVE' && quantity.lte(threshold),
-    conversions: p.conversions.map(
-      (c): ConversionDto => ({
-        id: c.id,
-        name: c.name,
-        factor: D(c.factor).toString(),
-        sellingPriceKobo: c.sellingPriceKobo === null ? null : koboToNumber(c.sellingPriceKobo),
-      }),
-    ),
+    conversions: p.conversions.map((c): ConversionDto => ({
+      id: c.id,
+      name: c.name,
+      factor: D(c.factor).toString(),
+      sellingPriceKobo: c.sellingPriceKobo === null ? null : koboToNumber(c.sellingPriceKobo),
+    })),
     updatedAt: p.updatedAt.toISOString(),
   };
   if (canSeeCost) {
@@ -104,7 +102,10 @@ export class ProductsService {
 
   private async assertCategory(businessId: string, categoryId?: string | null) {
     if (!categoryId) return;
-    const c = await this.prisma.category.findFirst({ where: { id: categoryId, businessId }, select: { id: true } });
+    const c = await this.prisma.category.findFirst({
+      where: { id: categoryId, businessId },
+      select: { id: true },
+    });
     if (!c) throw badRequest('CATEGORY_NOT_FOUND', 'The selected category does not exist.');
   }
 
@@ -113,17 +114,30 @@ export class ProductsService {
     if (dto.openingStock && !member.permissions.has('inventory.receive')) {
       throw forbidden('PERMISSION_DENIED', 'You do not have permission to record opening stock.');
     }
-    const reorder = dto.reorderThreshold ? parseQuantity(dto.reorderThreshold, 'reorderThreshold') : D(0);
-    const conversions = (dto.conversions ?? []).map((c) => ({ ...c, factor: parseFactor(c.factor) }));
-    this.assertDistinctUnits(dto.baseUnit, conversions.map((c) => c.name));
+    const reorder = dto.reorderThreshold
+      ? parseQuantity(dto.reorderThreshold, 'reorderThreshold')
+      : D(0);
+    const conversions = (dto.conversions ?? []).map((c) => ({
+      ...c,
+      factor: parseFactor(c.factor),
+    }));
+    this.assertDistinctUnits(
+      dto.baseUnit,
+      conversions.map((c) => c.name),
+    );
     const opening = dto.openingStock
-      ? { quantity: parseQuantity(dto.openingStock.quantity, 'openingStock.quantity'), unitCostKobo: D(dto.openingStock.unitCostKobo) }
+      ? {
+          quantity: parseQuantity(dto.openingStock.quantity, 'openingStock.quantity'),
+          unitCostKobo: D(dto.openingStock.unitCostKobo),
+        }
       : null;
     const name = dto.name.trim();
 
     const id = await this.prisma.transaction(async (tx) => {
       if (dto.sku) {
-        const dupSku = await tx.product.findFirst({ where: { businessId: member.businessId, sku: dto.sku } });
+        const dupSku = await tx.product.findFirst({
+          where: { businessId: member.businessId, sku: dto.sku },
+        });
         if (dupSku) throw conflict('SKU_EXISTS', 'Another product already uses this SKU.');
       }
       const product = await tx.product.create({
@@ -143,7 +157,8 @@ export class ProductsService {
               businessId: member.businessId,
               name: c.name.trim(),
               factor: c.factor,
-              sellingPriceKobo: c.sellingPriceKobo === undefined ? null : BigInt(c.sellingPriceKobo),
+              sellingPriceKobo:
+                c.sellingPriceKobo === undefined ? null : BigInt(c.sellingPriceKobo),
             })),
           },
           balance: { create: { businessId: member.businessId } },
@@ -186,7 +201,12 @@ export class ProductsService {
         action: 'product.create',
         entityType: 'product',
         entityId: product.id,
-        after: { name, sellingPriceKobo: dto.sellingPriceKobo, baseUnit: dto.baseUnit, opening: dto.openingStock },
+        after: {
+          name,
+          sellingPriceKobo: dto.sellingPriceKobo,
+          baseUnit: dto.baseUnit,
+          opening: dto.openingStock,
+        },
       });
       return product.id;
     });
@@ -196,12 +216,18 @@ export class ProductsService {
   private assertDistinctUnits(baseUnit: string, conversionNames: string[]) {
     const names = [baseUnit, ...conversionNames].map((n) => n.trim().toLowerCase());
     if (new Set(names).size !== names.length) {
-      throw badRequest('DUPLICATE_UNIT', 'Each unit name must be different, including the base unit.');
+      throw badRequest(
+        'DUPLICATE_UNIT',
+        'Each unit name must be different, including the base unit.',
+      );
     }
   }
 
   async get(member: TenantMember, id: string): Promise<ProductDto> {
-    const p = await this.prisma.product.findFirst({ where: { id, businessId: member.businessId }, include });
+    const p = await this.prisma.product.findFirst({
+      where: { id, businessId: member.businessId },
+      include,
+    });
     if (!p) throw notFound('Product');
     return toProductDto(p, this.canSeeCost(member));
   }
@@ -237,11 +263,14 @@ export class ProductsService {
   /** Everything the POS needs to work offline. Cost data is never included. */
   async posCatalogue(member: TenantMember, updatedSince?: string): Promise<ProductDto[]> {
     const since = updatedSince ? new Date(updatedSince) : undefined;
-    if (since && Number.isNaN(since.getTime())) throw badRequest('INVALID_DATE', 'updatedSince must be an ISO date.');
+    if (since && Number.isNaN(since.getTime()))
+      throw badRequest('INVALID_DATE', 'updatedSince must be an ISO date.');
     const rows = await this.prisma.product.findMany({
       where: {
         businessId: member.businessId,
-        ...(since ? { OR: [{ updatedAt: { gt: since } }, { balance: { updatedAt: { gt: since } } }] } : { status: 'ACTIVE' }),
+        ...(since
+          ? { OR: [{ updatedAt: { gt: since } }, { balance: { updatedAt: { gt: since } } }] }
+          : { status: 'ACTIVE' }),
       },
       include,
       orderBy: { name: 'asc' },
@@ -251,14 +280,20 @@ export class ProductsService {
   }
 
   async update(member: TenantMember, id: string, dto: UpdateProductDto): Promise<ProductDto> {
-    const before = await this.prisma.product.findFirst({ where: { id, businessId: member.businessId } });
+    const before = await this.prisma.product.findFirst({
+      where: { id, businessId: member.businessId },
+    });
     if (!before) throw notFound('Product');
     await this.assertCategory(member.businessId, dto.categoryId);
-    const reorder = dto.reorderThreshold ? parseQuantity(dto.reorderThreshold, 'reorderThreshold') : undefined;
+    const reorder = dto.reorderThreshold
+      ? parseQuantity(dto.reorderThreshold, 'reorderThreshold')
+      : undefined;
 
     await this.prisma.transaction(async (tx) => {
       if (dto.sku && dto.sku !== before.sku) {
-        const dup = await tx.product.findFirst({ where: { businessId: member.businessId, sku: dto.sku, NOT: { id } } });
+        const dup = await tx.product.findFirst({
+          where: { businessId: member.businessId, sku: dto.sku, NOT: { id } },
+        });
         if (dup) throw conflict('SKU_EXISTS', 'Another product already uses this SKU.');
       }
       const after = await tx.product.update({
@@ -268,7 +303,8 @@ export class ProductsService {
           sku: dto.sku?.trim(),
           barcode: dto.barcode?.trim(),
           categoryId: dto.categoryId,
-          sellingPriceKobo: dto.sellingPriceKobo === undefined ? undefined : BigInt(dto.sellingPriceKobo),
+          sellingPriceKobo:
+            dto.sellingPriceKobo === undefined ? undefined : BigInt(dto.sellingPriceKobo),
           reorderThreshold: reorder,
         },
       });
@@ -279,8 +315,18 @@ export class ProductsService {
         action: 'product.update',
         entityType: 'product',
         entityId: id,
-        before: { name: before.name, sku: before.sku, sellingPriceKobo: before.sellingPriceKobo, reorderThreshold: before.reorderThreshold.toString() },
-        after: { name: after.name, sku: after.sku, sellingPriceKobo: after.sellingPriceKobo, reorderThreshold: after.reorderThreshold.toString() },
+        before: {
+          name: before.name,
+          sku: before.sku,
+          sellingPriceKobo: before.sellingPriceKobo,
+          reorderThreshold: before.reorderThreshold.toString(),
+        },
+        after: {
+          name: after.name,
+          sku: after.sku,
+          sellingPriceKobo: after.sellingPriceKobo,
+          reorderThreshold: after.reorderThreshold.toString(),
+        },
       });
     });
     return this.get(member, id);
@@ -292,7 +338,10 @@ export class ProductsService {
     await this.prisma.transaction(async (tx) => {
       await tx.product.update({
         where: { id },
-        data: { status: archived ? 'ARCHIVED' : 'ACTIVE', archivedAt: archived ? new Date() : null },
+        data: {
+          status: archived ? 'ARCHIVED' : 'ACTIVE',
+          archivedAt: archived ? new Date() : null,
+        },
       });
       await this.audit.record(tx, {
         businessId: member.businessId,
@@ -307,13 +356,20 @@ export class ProductsService {
 
   // ───────────── unit conversions ─────────────
 
-  async addConversion(member: TenantMember, productId: string, dto: AddConversionDto): Promise<ProductDto> {
+  async addConversion(
+    member: TenantMember,
+    productId: string,
+    dto: AddConversionDto,
+  ): Promise<ProductDto> {
     const product = await this.prisma.product.findFirst({
       where: { id: productId, businessId: member.businessId },
       include: { conversions: { where: { archivedAt: null } } },
     });
     if (!product) throw notFound('Product');
-    this.assertDistinctUnits(product.baseUnit, [...product.conversions.map((c) => c.name), dto.name]);
+    this.assertDistinctUnits(product.baseUnit, [
+      ...product.conversions.map((c) => c.name),
+      dto.name,
+    ]);
     const factor = parseFactor(dto.factor);
     await this.prisma.transaction(async (tx) => {
       const c = await tx.unitConversion.create({
@@ -322,7 +378,8 @@ export class ProductsService {
           productId,
           name: dto.name.trim(),
           factor,
-          sellingPriceKobo: dto.sellingPriceKobo === undefined ? null : BigInt(dto.sellingPriceKobo),
+          sellingPriceKobo:
+            dto.sellingPriceKobo === undefined ? null : BigInt(dto.sellingPriceKobo),
         },
       });
       await this.audit.record(tx, {
@@ -338,7 +395,11 @@ export class ProductsService {
   }
 
   /** Conversions are immutable. To change a factor, archive it and add a new one. */
-  async archiveConversion(member: TenantMember, productId: string, conversionId: string): Promise<ProductDto> {
+  async archiveConversion(
+    member: TenantMember,
+    productId: string,
+    conversionId: string,
+  ): Promise<ProductDto> {
     const res = await this.prisma.unitConversion.updateMany({
       where: { id: conversionId, productId, businessId: member.businessId, archivedAt: null },
       data: { archivedAt: new Date() },

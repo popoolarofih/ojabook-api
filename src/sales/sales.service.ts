@@ -47,20 +47,35 @@ export class SalesService {
    */
   create(member: TenantMember, dto: CreateSaleDto, key: string) {
     return this.idempotency.run<SaleDto>(
-      { businessId: member.businessId, userId: member.userId, scope: 'sales.create', key, payload: dto },
+      {
+        businessId: member.businessId,
+        userId: member.userId,
+        scope: 'sales.create',
+        key,
+        payload: dto,
+      },
       async (tx) => ({ status: 201, body: await this.createInTx(tx, member, dto) }),
     );
   }
 
-  private async createInTx(tx: Prisma.TransactionClient, member: TenantMember, dto: CreateSaleDto): Promise<SaleDto> {
+  private async createInTx(
+    tx: Prisma.TransactionClient,
+    member: TenantMember,
+    dto: CreateSaleDto,
+  ): Promise<SaleDto> {
     const saleId = dto.id ?? randomUUID();
     const occurredAt = this.parseOccurredAt(dto.occurredAt);
 
     const customer = dto.customerId
-      ? await tx.customer.findFirst({ where: { id: dto.customerId, businessId: member.businessId } })
+      ? await tx.customer.findFirst({
+          where: { id: dto.customerId, businessId: member.businessId },
+        })
       : null;
     if (dto.customerId && (!customer || customer.status !== 'ACTIVE')) {
-      throw unprocessable('CUSTOMER_NOT_FOUND', 'The selected customer does not exist or is archived.');
+      throw unprocessable(
+        'CUSTOMER_NOT_FOUND',
+        'The selected customer does not exist or is archived.',
+      );
     }
 
     const products = await tx.product.findMany({
@@ -72,7 +87,13 @@ export class SalesService {
     // 1. Price every line on the server.
     let subtotal = 0n;
     let discountTotal = 0n;
-    const overrides: { productId: string; listPriceKobo: bigint; unitPriceKobo: bigint; discountKobo: bigint; reason?: string }[] = [];
+    const overrides: {
+      productId: string;
+      listPriceKobo: bigint;
+      unitPriceKobo: bigint;
+      discountKobo: bigint;
+      reason?: string;
+    }[] = [];
     const lines = dto.items.map((item) => {
       const product = byId.get(item.productId);
       if (!product) throw unprocessable('PRODUCT_NOT_FOUND', 'One of the products does not exist.');
@@ -86,10 +107,15 @@ export class SalesService {
       let listPrice = product.sellingPriceKobo;
       if (item.unitId) {
         const c = product.conversions.find((x) => x.id === item.unitId && !x.archivedAt);
-        if (!c) throw unprocessable('UNIT_NOT_FOUND', `That unit does not exist for ${product.name}.`);
+        if (!c)
+          throw unprocessable('UNIT_NOT_FOUND', `That unit does not exist for ${product.name}.`);
         unitName = c.name;
         factor = parseFactor(D(c.factor).toString());
-        listPrice = c.sellingPriceKobo ?? BigInt(D(product.sellingPriceKobo.toString()).mul(factor).toDecimalPlaces(0, 4).toFixed(0));
+        listPrice =
+          c.sellingPriceKobo ??
+          BigInt(
+            D(product.sellingPriceKobo.toString()).mul(factor).toDecimalPlaces(0, 4).toFixed(0),
+          );
       }
       const baseQuantity = toBaseQuantity(quantity, factor);
 
@@ -103,14 +129,34 @@ export class SalesService {
       }
       const gross = lineAmount(quantity, unitPrice);
       if (discount > gross) {
-        throw unprocessable('DISCOUNT_TOO_LARGE', `The discount on ${product.name} is more than the line amount.`);
+        throw unprocessable(
+          'DISCOUNT_TOO_LARGE',
+          `The discount on ${product.name} is more than the line amount.`,
+        );
       }
       if (unitPrice !== listPrice || discount > 0n) {
-        overrides.push({ productId: product.id, listPriceKobo: listPrice, unitPriceKobo: unitPrice, discountKobo: discount, reason: item.overrideReason });
+        overrides.push({
+          productId: product.id,
+          listPriceKobo: listPrice,
+          unitPriceKobo: unitPrice,
+          discountKobo: discount,
+          reason: item.overrideReason,
+        });
       }
       subtotal += gross;
       discountTotal += discount;
-      return { product, quantity, unitName, factor, baseQuantity, listPrice, unitPrice, discount, gross, reason: item.overrideReason };
+      return {
+        product,
+        quantity,
+        unitName,
+        factor,
+        baseQuantity,
+        listPrice,
+        unitPrice,
+        discount,
+        gross,
+        reason: item.overrideReason,
+      };
     });
     const total = subtotal - discountTotal;
     if (total <= 0n) throw unprocessable('EMPTY_SALE', 'The sale total must be greater than zero.');
@@ -127,7 +173,8 @@ export class SalesService {
         paidKobo: koboToNumber(paid),
       });
     }
-    const amountOf = (m: 'CASH' | 'TRANSFER' | 'CREDIT') => BigInt(dto.payments.find((p) => p.method === m)?.amountKobo ?? 0);
+    const amountOf = (m: 'CASH' | 'TRANSFER' | 'CREDIT') =>
+      BigInt(dto.payments.find((p) => p.method === m)?.amountKobo ?? 0);
     const cash = amountOf('CASH');
     const transfer = amountOf('TRANSFER');
     const credit = amountOf('CREDIT');
@@ -136,7 +183,11 @@ export class SalesService {
     }
 
     // 3. Take stock under row locks, snapshotting the cost of every line.
-    const positions = await this.stock.lock(tx, member.businessId, lines.map((l) => l.product.id));
+    const positions = await this.stock.lock(
+      tx,
+      member.businessId,
+      lines.map((l) => l.product.id),
+    );
     const costed = [];
     let cogsTotal = 0n;
     for (const l of lines) {
@@ -204,12 +255,23 @@ export class SalesService {
 
     // Cash is settled. A transfer entered by hand stays PENDING until trusted verification exists.
     const payments: Prisma.PaymentCreateManyInput[] = [];
-    if (cash > 0n) payments.push(this.payment(member, saleId, 'CASH', 'PAID', cash, occurredAt, customer?.id));
-    if (transfer > 0n) payments.push(this.payment(member, saleId, 'TRANSFER', 'PENDING', transfer, occurredAt, customer?.id));
+    if (cash > 0n)
+      payments.push(this.payment(member, saleId, 'CASH', 'PAID', cash, occurredAt, customer?.id));
+    if (transfer > 0n)
+      payments.push(
+        this.payment(member, saleId, 'TRANSFER', 'PENDING', transfer, occurredAt, customer?.id),
+      );
     if (payments.length) await tx.payment.createMany({ data: payments });
     if (credit > 0n) {
       await tx.receivable.create({
-        data: { businessId: member.businessId, customerId: customer!.id, saleId, originalKobo: credit, outstandingKobo: credit, dueDate },
+        data: {
+          businessId: member.businessId,
+          customerId: customer!.id,
+          saleId,
+          originalKobo: credit,
+          outstandingKobo: credit,
+          dueDate,
+        },
       });
     }
 
@@ -260,7 +322,11 @@ export class SalesService {
         entityId: saleId,
         reason: o.reason,
         before: { listPriceKobo: o.listPriceKobo },
-        after: { productId: o.productId, unitPriceKobo: o.unitPriceKobo, discountKobo: o.discountKobo },
+        after: {
+          productId: o.productId,
+          unitPriceKobo: o.unitPriceKobo,
+          discountKobo: o.discountKobo,
+        },
       });
     }
 
@@ -308,22 +374,35 @@ export class SalesService {
    */
   reverse(member: TenantMember, saleId: string, reason: string, key: string) {
     return this.idempotency.run<SaleDto>(
-      { businessId: member.businessId, userId: member.userId, scope: 'sales.reverse', key, payload: { saleId, reason } },
+      {
+        businessId: member.businessId,
+        userId: member.userId,
+        scope: 'sales.reverse',
+        key,
+        payload: { saleId, reason },
+      },
       async (tx) => {
         // Serialise concurrent reversals of the same sale.
         const locked = await tx.$queryRaw<{ id: string }[]>`
           SELECT id FROM sales WHERE id = ${saleId}::uuid AND "businessId" = ${member.businessId}::uuid FOR UPDATE`;
         if (locked.length === 0) throw notFound('Sale');
         const sale = await this.load(tx, member.businessId, saleId);
-        if (sale.status === 'REVERSED') throw conflict('SALE_ALREADY_REVERSED', 'This sale was already reversed.');
+        if (sale.status === 'REVERSED')
+          throw conflict('SALE_ALREADY_REVERSED', 'This sale was already reversed.');
 
         if (sale.receivable) {
           const [rec] = await tx.$queryRaw<{ outstandingKobo: bigint; originalKobo: bigint }[]>`
             SELECT "outstandingKobo", "originalKobo" FROM receivables WHERE id = ${sale.receivable.id}::uuid FOR UPDATE`;
           if (rec.outstandingKobo !== rec.originalKobo) {
-            throw conflict('SALE_HAS_REPAYMENTS', 'This sale has customer repayments. Resolve them before reversing the sale.');
+            throw conflict(
+              'SALE_HAS_REPAYMENTS',
+              'This sale has customer repayments. Resolve them before reversing the sale.',
+            );
           }
-          await tx.receivable.update({ where: { id: sale.receivable.id }, data: { status: 'VOIDED', voidedAt: new Date() } });
+          await tx.receivable.update({
+            where: { id: sale.receivable.id },
+            data: { status: 'VOIDED', voidedAt: new Date() },
+          });
         }
 
         const productIds = sale.items.filter((i) => i.productId).map((i) => i.productId!);
@@ -345,22 +424,26 @@ export class SalesService {
           });
         }
         for (const type of ['SALE', 'SALE_COGS'] as const) {
-          await this.ledger.reverseSource(tx, {
-            businessId: member.businessId,
-            sourceType: type,
-            sourceId: saleId,
-            reversalSourceType: type === 'SALE' ? 'SALE_REVERSAL' : 'SALE_COGS_REVERSAL',
-            reversalSourceId: saleId,
-            reason,
-            entryDate: now,
-            createdById: member.userId,
-          }).catch((e) => {
-            if (type === 'SALE_COGS' && e?.status === 404) return []; // zero cost sales have no COGS entry
-            throw e;
-          });
+          await this.ledger
+            .reverseSource(tx, {
+              businessId: member.businessId,
+              sourceType: type,
+              sourceId: saleId,
+              reversalSourceType: type === 'SALE' ? 'SALE_REVERSAL' : 'SALE_COGS_REVERSAL',
+              reversalSourceId: saleId,
+              reason,
+              entryDate: now,
+              createdById: member.userId,
+            })
+            .catch((e) => {
+              if (type === 'SALE_COGS' && e?.status === 404) return []; // zero cost sales have no COGS entry
+              throw e;
+            });
         }
         await tx.payment.updateMany({ where: { saleId }, data: { status: 'REVERSED' } });
-        await tx.saleReversal.create({ data: { saleId, businessId: member.businessId, reason, createdById: member.userId } });
+        await tx.saleReversal.create({
+          data: { saleId, businessId: member.businessId, reason, createdById: member.userId },
+        });
         await tx.sale.update({ where: { id: saleId }, data: { status: 'REVERSED' } });
         await this.audit.record(tx, {
           businessId: member.businessId,
@@ -372,14 +455,21 @@ export class SalesService {
           before: { status: 'COMPLETED', totalKobo: sale.totalKobo },
           after: { status: 'REVERSED' },
         });
-        return { status: 201, body: this.toDto(await this.load(tx, member.businessId, saleId), member) };
+        return {
+          status: 201,
+          body: this.toDto(await this.load(tx, member.businessId, saleId), member),
+        };
       },
     );
   }
 
   // ───────────── reads ─────────────
 
-  private async load(db: Prisma.TransactionClient | PrismaService, businessId: string, id: string): Promise<SaleRow> {
+  private async load(
+    db: Prisma.TransactionClient | PrismaService,
+    businessId: string,
+    id: string,
+  ): Promise<SaleRow> {
     const row = await db.sale.findFirst({ where: { id, businessId }, include: saleInclude });
     if (!row) throw notFound('Sale');
     return row;
@@ -387,7 +477,8 @@ export class SalesService {
 
   async get(member: TenantMember, id: string): Promise<SaleDto> {
     const sale = await this.load(this.prisma, member.businessId, id);
-    if (!member.permissions.has('sales.read_all') && sale.cashierId !== member.userId) throw notFound('Sale');
+    if (!member.permissions.has('sales.read_all') && sale.cashierId !== member.userId)
+      throw notFound('Sale');
     return this.toDto(sale, member);
   }
 
@@ -397,18 +488,26 @@ export class SalesService {
       throw forbidden('PERMISSION_DENIED', 'You do not have permission to view sales.');
     }
     const where: Prisma.SaleWhereInput = { businessId: member.businessId };
-    if (!readAll) where.cashierId = member.userId; // cashiers only ever see their own
+    if (!readAll)
+      where.cashierId = member.userId; // cashiers only ever see their own
     else if (q.cashierId) where.cashierId = q.cashierId;
     if (q.customerId) where.customerId = q.customerId;
     if (q.status) where.status = q.status;
-    if (q.receipt?.trim()) where.receiptNumber = { contains: q.receipt.trim(), mode: 'insensitive' };
+    if (q.receipt?.trim())
+      where.receiptNumber = { contains: q.receipt.trim(), mode: 'insensitive' };
     if (q.from || q.to) {
       const r = resolveRange({ from: q.from ?? q.to, to: q.to ?? q.from }, member.timezone);
       where.occurredAt = { gte: r.from, lt: r.to };
     }
     const { skip, take, page, pageSize } = skipTake(q);
     const [rows, total] = await Promise.all([
-      this.prisma.sale.findMany({ where, include: saleInclude, orderBy: { occurredAt: 'desc' }, skip, take }),
+      this.prisma.sale.findMany({
+        where,
+        include: saleInclude,
+        orderBy: { occurredAt: 'desc' },
+        skip,
+        take,
+      }),
       this.prisma.sale.count({ where }),
     ]);
     return { items: rows.map((r) => this.toDto(r, member)), page, pageSize, total };
@@ -436,7 +535,9 @@ export class SalesService {
         unitPriceKobo: koboToNumber(i.unitPriceKobo),
         discountKobo: koboToNumber(i.discountKobo),
         lineTotalKobo: koboToNumber(i.lineTotalKobo),
-        ...(cost ? { unitCostKobo: D(i.unitCostKobo).toFixed(4), cogsKobo: koboToNumber(i.cogsKobo) } : {}),
+        ...(cost
+          ? { unitCostKobo: D(i.unitCostKobo).toFixed(4), cogsKobo: koboToNumber(i.cogsKobo) }
+          : {}),
       })),
       payments: s.payments.map((p) => ({
         id: p.id,
@@ -449,11 +550,16 @@ export class SalesService {
       discountKobo: koboToNumber(s.discountKobo),
       totalKobo: koboToNumber(s.totalKobo),
       creditKobo: koboToNumber(s.creditKobo),
-      outstandingKobo: s.receivable && s.receivable.status !== 'VOIDED' ? koboToNumber(s.receivable.outstandingKobo) : 0,
+      outstandingKobo:
+        s.receivable && s.receivable.status !== 'VOIDED'
+          ? koboToNumber(s.receivable.outstandingKobo)
+          : 0,
       dueDate: s.dueDate ? s.dueDate.toISOString() : null,
       note: s.note,
       occurredAt: s.occurredAt.toISOString(),
-      reversal: s.reversal ? { reason: s.reversal.reason, at: s.reversal.createdAt.toISOString() } : null,
+      reversal: s.reversal
+        ? { reason: s.reversal.reason, at: s.reversal.createdAt.toISOString() }
+        : null,
     };
     if (cost) {
       dto.cogsKobo = koboToNumber(cogs);

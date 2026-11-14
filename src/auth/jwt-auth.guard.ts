@@ -1,4 +1,4 @@
-import { CanActivate, ExecutionContext, Inject, Injectable } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
@@ -22,7 +22,12 @@ export class JwtAuthGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    if (this.reflector.getAllAndOverride<boolean>(IS_PUBLIC, [context.getHandler(), context.getClass()])) {
+    if (
+      this.reflector.getAllAndOverride<boolean>(IS_PUBLIC, [
+        context.getHandler(),
+        context.getClass(),
+      ])
+    ) {
       return true;
     }
     const req = context.switchToHttp().getRequest<Request>();
@@ -42,7 +47,12 @@ export class JwtAuthGuard implements CanActivate {
 
     // Sessions can be revoked at any time (logout, reuse detection), so check the family.
     const active = await this.prisma.refreshToken.findFirst({
-      where: { familyId: payload.sid, userId: payload.sub, revokedAt: null, expiresAt: { gt: new Date() } },
+      where: {
+        familyId: payload.sid,
+        userId: payload.sub,
+        revokedAt: null,
+        expiresAt: { gt: new Date() },
+      },
       select: { id: true },
     });
     if (!active) throw unauthorized('SESSION_REVOKED', 'Your session has ended. Sign in again.');

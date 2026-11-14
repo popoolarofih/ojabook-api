@@ -16,7 +16,9 @@ export class SalesController {
   @RequirePermissions('sales.create')
   @Post()
   @ApiHeader({ name: 'Idempotency-Key', required: true })
-  @ApiOperation({ summary: 'Record a sale. Stock, payments, receivable and ledger post atomically.' })
+  @ApiOperation({
+    summary: 'Record a sale. Stock, payments, receivable and ledger post atomically.',
+  })
   @ApiOkResponse({ type: SaleDto })
   async create(
     @CurrentMember() m: TenantMember,

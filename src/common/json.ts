@@ -1,8 +1,6 @@
 /** Make a value safe for JSON columns: bigint becomes number, Decimal becomes string. */
 export function jsonSafe<T>(value: T): T {
-  return JSON.parse(
-    JSON.stringify(value, (_k, v) => (typeof v === 'bigint' ? Number(v) : v)),
-  ) as T;
+  return JSON.parse(JSON.stringify(value, (_k, v) => (typeof v === 'bigint' ? Number(v) : v))) as T;
 }
 
 /** Stable serialisation with sorted keys, used for request fingerprints. */

@@ -68,9 +68,16 @@ export class IdempotencyService {
           );
         }
         if (existing.responseStatus === null) {
-          throw conflict('IDEMPOTENCY_IN_PROGRESS', 'This request is still being processed. Retry shortly.');
+          throw conflict(
+            'IDEMPOTENCY_IN_PROGRESS',
+            'This request is still being processed. Retry shortly.',
+          );
         }
-        return { status: existing.responseStatus, body: existing.responseBody as T, replayed: true };
+        return {
+          status: existing.responseStatus,
+          body: existing.responseBody as T,
+          replayed: true,
+        };
       }
 
       const result = await work(tx);

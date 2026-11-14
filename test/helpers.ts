@@ -34,7 +34,8 @@ export async function resetDb(prisma: PrismaService) {
 
 let phoneCounter = 0;
 /** A valid, unique Nigerian mobile number per call. */
-export const uniquePhone = () => `0803${String(1_000_000 + ++phoneCounter + Math.floor(Math.random() * 1000) * 1000).slice(-7)}`;
+export const uniquePhone = () =>
+  `0803${String(1_000_000 + ++phoneCounter + Math.floor(Math.random() * 1000) * 1000).slice(-7)}`;
 
 export interface Session {
   token: string;
@@ -80,7 +81,12 @@ export interface ProductSeed {
   threshold?: string;
 }
 
-export async function createProduct(ctx: TestCtx, s: Session, businessId: string, p: ProductSeed = {}) {
+export async function createProduct(
+  ctx: TestCtx,
+  s: Session,
+  businessId: string,
+  p: ProductSeed = {},
+) {
   const res = await ctx
     .http()
     .post('/api/v1/products')
@@ -105,11 +111,26 @@ export async function setupShop(ctx: TestCtx) {
 }
 
 /** Invites and signs in a staff member with the given role. */
-export async function addStaff(ctx: TestCtx, owner: Session, businessId: string, role: 'MANAGER' | 'CASHIER' | 'INVENTORY_MANAGER') {
+export async function addStaff(
+  ctx: TestCtx,
+  owner: Session,
+  businessId: string,
+  role: 'MANAGER' | 'CASHIER' | 'INVENTORY_MANAGER',
+) {
   const phone = uniquePhone();
-  const inv = await ctx.http().post(`/api/v1/businesses/${businessId}/invitations`).set(auth(owner, businessId)).send({ phone, role }).expect(201);
+  const inv = await ctx
+    .http()
+    .post(`/api/v1/businesses/${businessId}/invitations`)
+    .set(auth(owner, businessId))
+    .send({ phone, role })
+    .expect(201);
   const staff = await signIn(ctx, phone);
-  await ctx.http().post('/api/v1/invitations/accept').set(auth(staff)).send({ token: inv.body.token }).expect(200);
+  await ctx
+    .http()
+    .post('/api/v1/invitations/accept')
+    .set(auth(staff))
+    .send({ token: inv.body.token })
+    .expect(200);
   return staff;
 }
 
@@ -119,10 +140,15 @@ export const postSale = (
   businessId: string,
   body: Record<string, unknown>,
   key = newKey(),
-) => ctx.http().post('/api/v1/sales').set(auth(s, businessId)).set('Idempotency-Key', key).send(body);
+) =>
+  ctx.http().post('/api/v1/sales').set(auth(s, businessId)).set('Idempotency-Key', key).send(body);
 
 /** Net balance (debit minus credit) of a system account, straight from the ledger. */
-export async function ledgerBalance(ctx: TestCtx, businessId: string, systemKey: string): Promise<bigint> {
+export async function ledgerBalance(
+  ctx: TestCtx,
+  businessId: string,
+  systemKey: string,
+): Promise<bigint> {
   const rows = await ctx.prisma.$queryRaw<{ b: bigint }[]>`
     SELECT COALESCE(SUM(l."debitKobo" - l."creditKobo"), 0)::bigint AS b
     FROM journal_lines l JOIN accounts a ON a.id = l."accountId"

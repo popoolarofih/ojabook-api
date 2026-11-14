@@ -43,7 +43,13 @@ export class InventoryService {
    */
   receive(member: TenantMember, dto: CreateStockReceiptDto, key: string) {
     return this.idempotency.run<StockReceiptResult>(
-      { businessId: member.businessId, userId: member.userId, scope: 'stock-receipts.create', key, payload: dto },
+      {
+        businessId: member.businessId,
+        userId: member.userId,
+        scope: 'stock-receipts.create',
+        key,
+        payload: dto,
+      },
       async (tx) => {
         const receiptId = dto.id ?? randomUUID();
         const occurredAt = dto.receivedAt ? new Date(dto.receivedAt) : new Date();
@@ -67,13 +73,17 @@ export class InventoryService {
           const product = byId.get(line.productId);
           if (!product) throw notFound('Product');
           if (product.status !== 'ACTIVE') {
-            throw unprocessable('PRODUCT_ARCHIVED', `${product.name} is archived. Restore it before receiving stock.`);
+            throw unprocessable(
+              'PRODUCT_ARCHIVED',
+              `${product.name} is archived. Restore it before receiving stock.`,
+            );
           }
           const quantity = parseQuantity(line.quantity);
           const factor = this.resolveFactor(product, line.unitId);
           const baseQuantity = toBaseQuantity(quantity, factor);
           const lineTotal = lineAmount(quantity, BigInt(line.unitCostKobo));
-          if (lineTotal <= 0n) throw unprocessable('INVALID_COST', `Enter the cost for ${product.name}.`);
+          if (lineTotal <= 0n)
+            throw unprocessable('INVALID_COST', `Enter the cost for ${product.name}.`);
           // Cost per base unit derived from what was actually paid, to 4 decimal places.
           const unitCostKobo = D(lineTotal.toString()).div(baseQuantity).toDecimalPlaces(4, 4);
 
@@ -117,15 +127,26 @@ export class InventoryService {
           action: 'stock.receive',
           entityType: 'stock_receipt',
           entityId: receiptId,
-          after: { totalCostKobo: total, lines: dto.lines.length, paymentMethod: dto.paymentMethod },
+          after: {
+            totalCostKobo: total,
+            lines: dto.lines.length,
+            paymentMethod: dto.paymentMethod,
+          },
         });
-        return { status: 201, body: { id: receiptId, totalCostKobo: koboToNumber(total), lines: results } };
+        return {
+          status: 201,
+          body: { id: receiptId, totalCostKobo: koboToNumber(total), lines: results },
+        };
       },
     );
   }
 
   private resolveFactor(
-    product: { id: string; name: string; conversions: { id: string; factor: Prisma.Decimal; archivedAt: Date | null }[] },
+    product: {
+      id: string;
+      name: string;
+      conversions: { id: string; factor: Prisma.Decimal; archivedAt: Date | null }[];
+    },
     unitId?: string,
   ) {
     if (!unitId) return D(1);
@@ -142,18 +163,34 @@ export class InventoryService {
    */
   adjust(member: TenantMember, dto: CreateStockAdjustmentDto, key: string) {
     return this.idempotency.run<StockAdjustmentResult>(
-      { businessId: member.businessId, userId: member.userId, scope: 'stock-adjustments.create', key, payload: dto },
+      {
+        businessId: member.businessId,
+        userId: member.userId,
+        scope: 'stock-adjustments.create',
+        key,
+        payload: dto,
+      },
       async (tx) => {
         const id = dto.id ?? randomUUID();
         const quantity = parseQuantity(dto.quantity);
         const direction = dto.direction;
-        if ((dto.reason === 'DAMAGED' || dto.reason === 'EXPIRED' || dto.reason === 'LOST_OR_STOLEN') && direction === 'IN') {
-          throw unprocessable('INVALID_ADJUSTMENT', 'Damaged, expired or lost stock can only be taken out.');
+        if (
+          (dto.reason === 'DAMAGED' ||
+            dto.reason === 'EXPIRED' ||
+            dto.reason === 'LOST_OR_STOLEN') &&
+          direction === 'IN'
+        ) {
+          throw unprocessable(
+            'INVALID_ADJUSTMENT',
+            'Damaged, expired or lost stock can only be taken out.',
+          );
         }
         if (dto.reason === 'FOUND' && direction === 'OUT') {
           throw unprocessable('INVALID_ADJUSTMENT', 'Found stock can only be added.');
         }
-        const product = await tx.product.findFirst({ where: { id: dto.productId, businessId: member.businessId } });
+        const product = await tx.product.findFirst({
+          where: { id: dto.productId, businessId: member.businessId },
+        });
         if (!product) throw notFound('Product');
 
         const positions = await this.stock.lock(tx, member.businessId, [product.id]);
@@ -176,7 +213,11 @@ export class InventoryService {
         if (direction === 'IN') {
           movementType = 'ADJUSTMENT_IN';
           const avg = positions.get(product.id)!.avgCostKobo;
-          const after = await this.stock.receive(tx, positions, { ...common, type: 'ADJUSTMENT_IN', unitCostKobo: avg });
+          const after = await this.stock.receive(tx, positions, {
+            ...common,
+            type: 'ADJUSTMENT_IN',
+            unitCostKobo: avg,
+          });
           value = costOfGoods(quantity, avg);
           quantityAfter = after.quantity;
           if (value > 0n) {
@@ -186,7 +227,8 @@ export class InventoryService {
             ]);
           }
         } else {
-          movementType = dto.reason === 'DAMAGED' || dto.reason === 'EXPIRED' ? 'DAMAGED' : 'ADJUSTMENT_OUT';
+          movementType =
+            dto.reason === 'DAMAGED' || dto.reason === 'EXPIRED' ? 'DAMAGED' : 'ADJUSTMENT_OUT';
           const issued = await this.stock.issue(tx, positions, {
             ...common,
             type: movementType as 'ADJUSTMENT_OUT' | 'DAMAGED',
@@ -212,7 +254,13 @@ export class InventoryService {
         });
         return {
           status: 201,
-          body: { id, productId: product.id, movementType, quantityAfter: qtyToString(quantityAfter), valueKobo: koboToNumber(value) },
+          body: {
+            id,
+            productId: product.id,
+            movementType,
+            quantityAfter: qtyToString(quantityAfter),
+            valueKobo: koboToNumber(value),
+          },
         };
       },
     );

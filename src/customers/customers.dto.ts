@@ -1,11 +1,29 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsDateString, IsIn, IsInt, IsOptional, IsString, IsUUID, Length, Matches, MaxLength, Min } from 'class-validator';
+import {
+  IsDateString,
+  IsIn,
+  IsInt,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Length,
+  Matches,
+  MaxLength,
+  Min,
+} from 'class-validator';
 import { PageQuery } from '../common/pagination';
 
 export class CreateCustomerDto {
-  @ApiPropertyOptional({ description: 'Client generated UUID so offline creation is retry safe.' }) @IsOptional() @IsUUID() id?: string;
+  @ApiPropertyOptional({ description: 'Client generated UUID so offline creation is retry safe.' })
+  @IsOptional()
+  @IsUUID()
+  id?: string;
   @ApiProperty({ example: 'Mama Tunde' }) @IsString() @Length(2, 80) name: string;
-  @ApiPropertyOptional({ example: '0805 111 2222' }) @IsOptional() @IsString() @MaxLength(25) phone?: string;
+  @ApiPropertyOptional({ example: '0805 111 2222' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(25)
+  phone?: string;
   @ApiPropertyOptional() @IsOptional() @IsString() @MaxLength(300) notes?: string;
 }
 
@@ -13,13 +31,19 @@ export class UpdateCustomerDto {
   @ApiPropertyOptional() @IsOptional() @IsString() @Length(2, 80) name?: string;
   @ApiPropertyOptional() @IsOptional() @IsString() @MaxLength(25) phone?: string;
   @ApiPropertyOptional() @IsOptional() @IsString() @MaxLength(300) notes?: string;
-  @ApiPropertyOptional({ enum: ['ACTIVE', 'ARCHIVED'] }) @IsOptional() @IsIn(['ACTIVE', 'ARCHIVED']) status?: 'ACTIVE' | 'ARCHIVED';
+  @ApiPropertyOptional({ enum: ['ACTIVE', 'ARCHIVED'] })
+  @IsOptional()
+  @IsIn(['ACTIVE', 'ARCHIVED'])
+  status?: 'ACTIVE' | 'ARCHIVED';
 }
 
 export class ListCustomersQuery extends PageQuery {
   @ApiPropertyOptional() @IsOptional() @IsString() @MaxLength(80) q?: string;
   @ApiPropertyOptional({ enum: ['true'] }) @IsOptional() @IsIn(['true']) hasBalance?: 'true';
-  @ApiPropertyOptional({ enum: ['ACTIVE', 'ARCHIVED'], default: 'ACTIVE' }) @IsOptional() @IsIn(['ACTIVE', 'ARCHIVED']) status?: 'ACTIVE' | 'ARCHIVED';
+  @ApiPropertyOptional({ enum: ['ACTIVE', 'ARCHIVED'], default: 'ACTIVE' })
+  @IsOptional()
+  @IsIn(['ACTIVE', 'ARCHIVED'])
+  status?: 'ACTIVE' | 'ARCHIVED';
 }
 
 export class CustomerDto {
@@ -44,7 +68,10 @@ export class CustomerPage {
 }
 
 export class ListReceivablesQuery extends PageQuery {
-  @ApiPropertyOptional({ enum: ['open', 'overdue', 'settled'], default: 'open' }) @IsOptional() @IsIn(['open', 'overdue', 'settled']) view?: 'open' | 'overdue' | 'settled';
+  @ApiPropertyOptional({ enum: ['open', 'overdue', 'settled'], default: 'open' })
+  @IsOptional()
+  @IsIn(['open', 'overdue', 'settled'])
+  view?: 'open' | 'overdue' | 'settled';
   @ApiPropertyOptional() @IsOptional() @IsUUID() customerId?: string;
 }
 
@@ -71,10 +98,21 @@ export class ReceivablePage {
 }
 
 export class RepaymentDto {
-  @ApiPropertyOptional({ description: 'Client generated payment id.' }) @IsOptional() @IsUUID() id?: string;
-  @ApiProperty({ description: 'Kobo. Cannot be more than the amount owed.' }) @IsInt() @Min(1) amountKobo: number;
-  @ApiProperty({ enum: ['CASH', 'TRANSFER'], description: 'A transfer stays unverified and does not reduce the balance until it is verified.' })
-  @IsIn(['CASH', 'TRANSFER']) method: 'CASH' | 'TRANSFER';
+  @ApiPropertyOptional({ description: 'Client generated payment id.' })
+  @IsOptional()
+  @IsUUID()
+  id?: string;
+  @ApiProperty({ description: 'Kobo. Cannot be more than the amount owed.' })
+  @IsInt()
+  @Min(1)
+  amountKobo: number;
+  @ApiProperty({
+    enum: ['CASH', 'TRANSFER'],
+    description:
+      'A transfer stays unverified and does not reduce the balance until it is verified.',
+  })
+  @IsIn(['CASH', 'TRANSFER'])
+  method: 'CASH' | 'TRANSFER';
   @ApiPropertyOptional() @IsOptional() @IsString() @MaxLength(200) note?: string;
   @ApiPropertyOptional() @IsOptional() @IsDateString() occurredAt?: string;
 }
@@ -84,7 +122,12 @@ export class RepaymentResult {
   status: string;
   verified: boolean;
   amountKobo: number;
-  allocations: { receivableId: string; receiptNumber: string; amountKobo: number; remainingKobo: number }[];
+  allocations: {
+    receivableId: string;
+    receiptNumber: string;
+    amountKobo: number;
+    remainingKobo: number;
+  }[];
   customerOutstandingKobo: number;
 }
 

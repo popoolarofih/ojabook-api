@@ -137,22 +137,36 @@ export class BusinessesService {
     }));
   }
 
-  async updateMember(member: TenantMember, memberId: string, dto: UpdateMemberDto): Promise<MemberDto[]> {
+  async updateMember(
+    member: TenantMember,
+    memberId: string,
+    dto: UpdateMemberDto,
+  ): Promise<MemberDto[]> {
     const target = await this.prisma.businessMember.findFirst({
       where: { id: memberId, businessId: member.businessId, status: { not: 'REMOVED' } },
     });
     if (!target) throw notFound('Member');
     if (target.role === 'OWNER') {
-      throw forbidden('OWNER_PROTECTED', 'The owner cannot be changed. Transfer ownership instead.');
+      throw forbidden(
+        'OWNER_PROTECTED',
+        'The owner cannot be changed. Transfer ownership instead.',
+      );
     }
     if ((dto.role as string) === 'OWNER') {
-      throw badRequest('OWNER_ASSIGN_FORBIDDEN', 'Use ownership transfer to make someone the owner.');
+      throw badRequest(
+        'OWNER_ASSIGN_FORBIDDEN',
+        'Use ownership transfer to make someone the owner.',
+      );
     }
     for (const p of [...(dto.extraPermissions ?? []), ...(dto.revokedPermissions ?? [])]) {
-      if (!isPermission(p)) throw badRequest('UNKNOWN_PERMISSION', `"${p}" is not a known permission.`);
+      if (!isPermission(p))
+        throw badRequest('UNKNOWN_PERMISSION', `"${p}" is not a known permission.`);
     }
     if (!dto.reason || dto.reason.trim().length < 3) {
-      throw badRequest('REASON_REQUIRED', 'Give a short reason for this change. It is kept in the audit trail.');
+      throw badRequest(
+        'REASON_REQUIRED',
+        'Give a short reason for this change. It is kept in the audit trail.',
+      );
     }
 
     await this.prisma.transaction(async (tx) => {
@@ -172,8 +186,18 @@ export class BusinessesService {
         entityType: 'business_member',
         entityId: target.id,
         reason: dto.reason,
-        before: { role: target.role, status: target.status, extra: target.extraPermissions, revoked: target.revokedPermissions },
-        after: { role: updated.role, status: updated.status, extra: updated.extraPermissions, revoked: updated.revokedPermissions },
+        before: {
+          role: target.role,
+          status: target.status,
+          extra: target.extraPermissions,
+          revoked: target.revokedPermissions,
+        },
+        after: {
+          role: updated.role,
+          status: updated.status,
+          extra: updated.extraPermissions,
+          revoked: updated.revokedPermissions,
+        },
       });
     });
     return this.listMembers(member);
@@ -199,8 +223,13 @@ export class BusinessesService {
     });
   }
 
-  async transferOwnership(member: TenantMember, targetMemberId: string, reason: string): Promise<MemberDto[]> {
-    if (member.role !== 'OWNER') throw forbidden('OWNER_ONLY', 'Only the owner can transfer ownership.');
+  async transferOwnership(
+    member: TenantMember,
+    targetMemberId: string,
+    reason: string,
+  ): Promise<MemberDto[]> {
+    if (member.role !== 'OWNER')
+      throw forbidden('OWNER_ONLY', 'Only the owner can transfer ownership.');
     const target = await this.prisma.businessMember.findFirst({
       where: { id: targetMemberId, businessId: member.businessId, status: 'ACTIVE' },
     });
@@ -231,7 +260,8 @@ export class BusinessesService {
   // ───────────── invitations ─────────────
 
   async invite(member: TenantMember, dto: InviteMemberDto): Promise<CreatedInvitationDto> {
-    if (dto.role === 'OWNER') throw badRequest('OWNER_ASSIGN_FORBIDDEN', 'Staff cannot be invited as owner.');
+    if (dto.role === 'OWNER')
+      throw badRequest('OWNER_ASSIGN_FORBIDDEN', 'Staff cannot be invited as owner.');
     const phone = normalizeNigerianPhone(dto.phone);
 
     const existingUser = await this.prisma.user.findUnique({ where: { phone } });
@@ -274,7 +304,13 @@ export class BusinessesService {
     });
   }
 
-  private invitationDto(inv: { id: string; phone: string; role: MemberRole; expiresAt: Date; status: string }): InvitationDto {
+  private invitationDto(inv: {
+    id: string;
+    phone: string;
+    role: MemberRole;
+    expiresAt: Date;
+    status: string;
+  }): InvitationDto {
     const expired = inv.status === 'PENDING' && inv.expiresAt <= new Date();
     return {
       id: inv.id,
@@ -304,11 +340,17 @@ export class BusinessesService {
   /** Single use, expiring token, bound to the invited phone number. */
   async acceptInvitation(userId: string, token: string): Promise<BusinessDto> {
     const user = await this.prisma.user.findUniqueOrThrow({ where: { id: userId } });
-    const invalid = () => badRequest('INVITATION_INVALID', 'This invitation is invalid or has expired.');
+    const invalid = () =>
+      badRequest('INVITATION_INVALID', 'This invitation is invalid or has expired.');
 
     return this.prisma.transaction(async (tx) => {
       const inv = await tx.invitation.findUnique({ where: { tokenHash: sha256(token) } });
-      if (!inv || inv.status !== 'PENDING' || inv.expiresAt <= new Date() || inv.phone !== user.phone) {
+      if (
+        !inv ||
+        inv.status !== 'PENDING' ||
+        inv.expiresAt <= new Date() ||
+        inv.phone !== user.phone
+      ) {
         throw invalid();
       }
       // Atomic single use.

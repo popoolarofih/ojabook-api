@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon';
 import { badRequest } from './errors';
 
+export type RangeType = RangePreset;
 export type RangePreset = 'today' | 'yesterday' | 'last7' | 'last30' | 'custom';
 
 export interface ResolvedRange {

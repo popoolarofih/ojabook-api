@@ -1,4 +1,14 @@
-import { Body, Controller, Get, HttpCode, Param, ParseUUIDPipe, Patch, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { TenantMember } from '../auth/auth.types';
 import { CurrentMember, RequirePermissions, Tenant } from '../auth/decorators';
@@ -44,7 +54,9 @@ export class ProductsController {
 
   @RequirePermissions('sales.create')
   @Get('products/pos-catalogue')
-  @ApiOperation({ summary: 'Compact catalogue for the POS and the offline cache. Never includes cost.' })
+  @ApiOperation({
+    summary: 'Compact catalogue for the POS and the offline cache. Never includes cost.',
+  })
   @ApiOkResponse({ type: [ProductDto] })
   pos(@CurrentMember() m: TenantMember, @Query() q: PosCatalogueQuery) {
     return this.products.posCatalogue(m, q.updatedSince);
@@ -67,7 +79,11 @@ export class ProductsController {
   @RequirePermissions('products.write')
   @Patch('products/:id')
   @ApiOkResponse({ type: ProductDto })
-  update(@CurrentMember() m: TenantMember, @Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateProductDto) {
+  update(
+    @CurrentMember() m: TenantMember,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: UpdateProductDto,
+  ) {
     return this.products.update(m, id, dto);
   }
 
@@ -90,7 +106,11 @@ export class ProductsController {
   @RequirePermissions('products.write')
   @Post('products/:id/conversions')
   @ApiOkResponse({ type: ProductDto })
-  addConversion(@CurrentMember() m: TenantMember, @Param('id', ParseUUIDPipe) id: string, @Body() dto: AddConversionDto) {
+  addConversion(
+    @CurrentMember() m: TenantMember,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: AddConversionDto,
+  ) {
     return this.products.addConversion(m, id, dto);
   }
 

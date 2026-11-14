@@ -46,7 +46,9 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     redisUrl: e.REDIS_URL,
     jwtAccessSecret: e.JWT_ACCESS_SECRET,
     otpPepper: e.OTP_PEPPER,
-    webOrigins: e.WEB_ORIGINS.split(',').map((o) => o.trim()).filter(Boolean),
+    webOrigins: e.WEB_ORIGINS.split(',')
+      .map((o) => o.trim())
+      .filter(Boolean),
     otpProvider: e.OTP_PROVIDER,
     accessTokenTtlSeconds: e.ACCESS_TOKEN_TTL_SECONDS,
     refreshTokenTtlDays: e.REFRESH_TOKEN_TTL_DAYS,

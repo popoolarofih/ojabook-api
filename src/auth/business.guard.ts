@@ -18,7 +18,8 @@ export class BusinessGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest<Request>();
     const businessId = req.headers['x-business-id'];
-    const denied = () => forbidden('BUSINESS_ACCESS_DENIED', 'You do not have access to this business.');
+    const denied = () =>
+      forbidden('BUSINESS_ACCESS_DENIED', 'You do not have access to this business.');
 
     if (typeof businessId !== 'string' || !UUID.test(businessId) || !req.user) throw denied();
 
@@ -33,7 +34,11 @@ export class BusinessGuard implements CanActivate {
       userId: member.userId,
       businessId,
       role: member.role,
-      permissions: resolvePermissions(member.role, member.extraPermissions, member.revokedPermissions),
+      permissions: resolvePermissions(
+        member.role,
+        member.extraPermissions,
+        member.revokedPermissions,
+      ),
       timezone: member.business.timezone,
       currency: member.business.currency,
     };

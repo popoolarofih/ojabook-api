@@ -74,7 +74,9 @@ export class SessionService {
   }
 
   async rotate(rawToken: string, meta: SessionMeta): Promise<IssuedSession> {
-    const existing = await this.prisma.refreshToken.findUnique({ where: { tokenHash: sha256(rawToken) } });
+    const existing = await this.prisma.refreshToken.findUnique({
+      where: { tokenHash: sha256(rawToken) },
+    });
     const invalid = () => unauthorized('REFRESH_INVALID', 'Your session has ended. Sign in again.');
     if (!existing) throw invalid();
 
@@ -134,7 +136,9 @@ export class SessionService {
   }
 
   async revokeByRawToken(rawToken: string): Promise<void> {
-    const token = await this.prisma.refreshToken.findUnique({ where: { tokenHash: sha256(rawToken) } });
+    const token = await this.prisma.refreshToken.findUnique({
+      where: { tokenHash: sha256(rawToken) },
+    });
     if (token) await this.revokeFamily(token.familyId);
   }
 
