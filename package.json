@@ -11,7 +11,7 @@
     "build": "nest build",
     "start": "node dist/main.js",
     "start:dev": "nest start --watch",
-    "lint": "eslint \"{src,test}/**/*.ts\"",
+    "lint": "eslint --max-warnings 0 \"{src,test}/**/*.ts\"",
     "format": "prettier --write \"{src,test}/**/*.ts\"",
     "format:check": "prettier --check \"{src,test}/**/*.ts\"",
     "typecheck": "tsc --noEmit -p tsconfig.json",
@@ -21,7 +21,7 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate:dev": "prisma migrate dev",
     "prisma:migrate:deploy": "prisma migrate deploy",
-    "openapi:export": "ts-node -r tsconfig-paths/register scripts/export-openapi.ts"
+    "openapi:export": "nest build && node dist/openapi-export.js"
   },
   "dependencies": {
     "@nest-lab/throttler-storage-redis": "^1.2.0",

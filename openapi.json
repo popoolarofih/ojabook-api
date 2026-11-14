@@ -10,6 +10,7 @@
             "description": ""
           }
         },
+        "summary": "Liveness: the process is up.",
         "tags": [
           "health"
         ]
@@ -24,6 +25,7 @@
             "description": ""
           }
         },
+        "summary": "Readiness: the database answers. Used by the load balancer and deploy checks.",
         "tags": [
           "health"
         ]
@@ -413,15 +415,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -442,6 +435,9 @@
           },
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "tags": [
@@ -455,15 +451,6 @@
             "name": "id",
             "required": true,
             "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
             "schema": {
               "type": "string"
             }
@@ -497,6 +484,9 @@
           },
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "tags": [
@@ -512,15 +502,6 @@
             "name": "id",
             "required": true,
             "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
             "schema": {
               "type": "string"
             }
@@ -547,6 +528,9 @@
           },
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "tags": [
@@ -562,15 +546,6 @@
             "name": "id",
             "required": true,
             "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
             "schema": {
               "type": "string"
             }
@@ -604,6 +579,9 @@
           },
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "tags": [
@@ -617,15 +595,6 @@
             "name": "id",
             "required": true,
             "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
             "schema": {
               "type": "string"
             }
@@ -652,6 +621,9 @@
           },
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "tags": [
@@ -678,15 +650,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -700,6 +663,9 @@
           },
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "tags": [
@@ -715,15 +681,6 @@
             "name": "memberId",
             "required": true,
             "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
             "schema": {
               "type": "string"
             }
@@ -760,6 +717,9 @@
           },
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "summary": "Change a member role, status or permission refinements",
@@ -779,13 +739,10 @@
             }
           },
           {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "name": "reason",
+            "required": false,
+            "in": "query",
+            "schema": {}
           }
         ],
         "responses": {
@@ -799,6 +756,9 @@
           },
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "tags": [
@@ -814,15 +774,6 @@
             "name": "id",
             "required": true,
             "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
             "schema": {
               "type": "string"
             }
@@ -859,6 +810,9 @@
           },
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "tags": [
@@ -869,17 +823,7 @@
     "/api/v1/audit-logs": {
       "get": {
         "operationId": "BusinessesController_audit",
-        "parameters": [
-          {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "parameters": [],
         "responses": {
           "200": {
             "description": ""
@@ -891,6 +835,9 @@
           },
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "summary": "Recent audit events for the active business",
@@ -902,17 +849,7 @@
     "/api/v1/inventory/summary": {
       "get": {
         "operationId": "InventoryController_summary",
-        "parameters": [
-          {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "parameters": [],
         "responses": {
           "200": {
             "description": "",
@@ -928,6 +865,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "tags": [
@@ -939,15 +879,6 @@
       "get": {
         "operationId": "InventoryController_movements",
         "parameters": [
-          {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "name": "page",
             "required": false,
@@ -974,6 +905,7 @@
             "required": false,
             "in": "query",
             "schema": {
+              "format": "uuid",
               "type": "string"
             }
           },
@@ -1028,6 +960,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "summary": "Append only stock movement history",
@@ -1040,15 +975,6 @@
       "post": {
         "operationId": "InventoryController_receive",
         "parameters": [
-          {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "name": "Idempotency-Key",
             "in": "header",
@@ -1084,6 +1010,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "summary": "Record purchased stock. Blends the weighted average cost.",
@@ -1096,15 +1025,6 @@
       "post": {
         "operationId": "InventoryController_adjust",
         "parameters": [
-          {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "name": "Idempotency-Key",
             "in": "header",
@@ -1140,6 +1060,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "summary": "Add or remove stock with a reason. Audited.",
@@ -1151,17 +1074,7 @@
     "/api/v1/categories": {
       "get": {
         "operationId": "ProductsController_categories",
-        "parameters": [
-          {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "parameters": [],
         "responses": {
           "200": {
             "description": "",
@@ -1180,6 +1093,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "tags": [
@@ -1188,17 +1104,7 @@
       },
       "post": {
         "operationId": "ProductsController_createCategory",
-        "parameters": [
-          {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
@@ -1224,6 +1130,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "tags": [
@@ -1235,15 +1144,6 @@
       "get": {
         "operationId": "ProductsController_list",
         "parameters": [
-          {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "name": "page",
             "required": false,
@@ -1271,6 +1171,7 @@
             "in": "query",
             "description": "Matches name, SKU or barcode.",
             "schema": {
+              "maxLength": 80,
               "type": "string"
             }
           },
@@ -1279,6 +1180,7 @@
             "required": false,
             "in": "query",
             "schema": {
+              "format": "uuid",
               "type": "string"
             }
           },
@@ -1301,7 +1203,11 @@
             "required": false,
             "in": "query",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ]
             }
           }
         ],
@@ -1320,6 +1226,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "tags": [
@@ -1328,17 +1237,7 @@
       },
       "post": {
         "operationId": "ProductsController_create",
-        "parameters": [
-          {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
@@ -1364,6 +1263,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "tags": [
@@ -1375,15 +1277,6 @@
       "get": {
         "operationId": "ProductsController_pos",
         "parameters": [
-          {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "name": "updatedSince",
             "required": false,
@@ -1420,6 +1313,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "summary": "Compact catalogue for the POS and the offline cache. Never includes cost.",
@@ -1432,15 +1328,6 @@
       "get": {
         "operationId": "ProductsController_get",
         "parameters": [
-          {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "name": "id",
             "required": true,
@@ -1465,6 +1352,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "tags": [
@@ -1474,15 +1364,6 @@
       "patch": {
         "operationId": "ProductsController_update",
         "parameters": [
-          {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "name": "id",
             "required": true,
@@ -1517,6 +1398,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "tags": [
@@ -1529,15 +1413,6 @@
         "operationId": "ProductsController_archive",
         "parameters": [
           {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "id",
             "required": true,
             "in": "path",
@@ -1561,6 +1436,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "tags": [
@@ -1573,15 +1451,6 @@
         "operationId": "ProductsController_unarchive",
         "parameters": [
           {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "id",
             "required": true,
             "in": "path",
@@ -1605,6 +1474,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "tags": [
@@ -1616,15 +1488,6 @@
       "post": {
         "operationId": "ProductsController_addConversion",
         "parameters": [
-          {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "name": "id",
             "required": true,
@@ -1659,6 +1522,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "tags": [
@@ -1670,15 +1536,6 @@
       "post": {
         "operationId": "ProductsController_archiveConversion",
         "parameters": [
-          {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "name": "id",
             "required": true,
@@ -1711,6 +1568,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "tags": [
@@ -1722,15 +1582,6 @@
       "post": {
         "operationId": "SalesController_create",
         "parameters": [
-          {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "name": "Idempotency-Key",
             "in": "header",
@@ -1765,6 +1616,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "summary": "Record a sale. Stock, payments, receivable and ledger post atomically.",
@@ -1775,15 +1629,6 @@
       "get": {
         "operationId": "SalesController_list",
         "parameters": [
-          {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "name": "page",
             "required": false,
@@ -1811,6 +1656,7 @@
             "in": "query",
             "description": "YYYY-MM-DD in the business timezone.",
             "schema": {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
               "type": "string"
             }
           },
@@ -1819,6 +1665,7 @@
             "required": false,
             "in": "query",
             "schema": {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
               "type": "string"
             }
           },
@@ -1827,6 +1674,7 @@
             "required": false,
             "in": "query",
             "schema": {
+              "format": "uuid",
               "type": "string"
             }
           },
@@ -1835,6 +1683,7 @@
             "required": false,
             "in": "query",
             "schema": {
+              "format": "uuid",
               "type": "string"
             }
           },
@@ -1844,6 +1693,7 @@
             "in": "query",
             "description": "Receipt number search.",
             "schema": {
+              "maxLength": 30,
               "type": "string"
             }
           },
@@ -1875,6 +1725,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "summary": "Search sales. Cashiers only see their own.",
@@ -1887,15 +1740,6 @@
       "get": {
         "operationId": "SalesController_get",
         "parameters": [
-          {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "name": "id",
             "required": true,
@@ -1920,6 +1764,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "tags": [
@@ -1931,15 +1778,6 @@
       "post": {
         "operationId": "SalesController_reverse",
         "parameters": [
-          {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "name": "id",
             "required": true,
@@ -1982,6 +1820,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "summary": "Reverse a sale with a reason. The original records stay untouched.",
@@ -1994,15 +1835,6 @@
       "get": {
         "operationId": "CustomersController_list",
         "parameters": [
-          {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "name": "page",
             "required": false,
@@ -2029,6 +1861,7 @@
             "required": false,
             "in": "query",
             "schema": {
+              "maxLength": 80,
               "type": "string"
             }
           },
@@ -2072,6 +1905,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "tags": [
@@ -2080,17 +1916,7 @@
       },
       "post": {
         "operationId": "CustomersController_create",
-        "parameters": [
-          {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
@@ -2116,6 +1942,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "tags": [
@@ -2127,15 +1956,6 @@
       "get": {
         "operationId": "CustomersController_get",
         "parameters": [
-          {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "name": "id",
             "required": true,
@@ -2160,6 +1980,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "tags": [
@@ -2169,15 +1992,6 @@
       "patch": {
         "operationId": "CustomersController_update",
         "parameters": [
-          {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "name": "id",
             "required": true,
@@ -2212,6 +2026,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "tags": [
@@ -2223,15 +2040,6 @@
       "get": {
         "operationId": "CustomersController_statement",
         "parameters": [
-          {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "name": "id",
             "required": true,
@@ -2246,6 +2054,7 @@
             "in": "query",
             "description": "YYYY-MM-DD",
             "schema": {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
               "type": "string"
             }
           },
@@ -2255,6 +2064,7 @@
             "in": "query",
             "description": "YYYY-MM-DD",
             "schema": {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
               "type": "string"
             }
           }
@@ -2274,6 +2084,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "tags": [
@@ -2285,15 +2098,6 @@
       "post": {
         "operationId": "CustomersController_repayCustomer",
         "parameters": [
-          {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "name": "id",
             "required": true,
@@ -2336,6 +2140,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "tags": [
@@ -2347,15 +2154,6 @@
       "get": {
         "operationId": "CustomersController_listReceivables",
         "parameters": [
-          {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "name": "page",
             "required": false,
@@ -2396,6 +2194,7 @@
             "required": false,
             "in": "query",
             "schema": {
+              "format": "uuid",
               "type": "string"
             }
           }
@@ -2415,6 +2214,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "tags": [
@@ -2426,15 +2228,6 @@
       "post": {
         "operationId": "CustomersController_repay",
         "parameters": [
-          {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "name": "id",
             "required": true,
@@ -2477,6 +2270,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "tags": [
@@ -2487,17 +2283,7 @@
     "/api/v1/expense-categories": {
       "get": {
         "operationId": "ExpensesController_categories",
-        "parameters": [
-          {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "parameters": [],
         "responses": {
           "200": {
             "description": "",
@@ -2516,6 +2302,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "tags": [
@@ -2524,17 +2313,7 @@
       },
       "post": {
         "operationId": "ExpensesController_createCategory",
-        "parameters": [
-          {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
@@ -2560,6 +2339,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "tags": [
@@ -2571,15 +2353,6 @@
       "get": {
         "operationId": "ExpensesController_list",
         "parameters": [
-          {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "name": "page",
             "required": false,
@@ -2606,6 +2379,7 @@
             "required": false,
             "in": "query",
             "schema": {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
               "type": "string"
             }
           },
@@ -2614,6 +2388,7 @@
             "required": false,
             "in": "query",
             "schema": {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
               "type": "string"
             }
           },
@@ -2622,6 +2397,7 @@
             "required": false,
             "in": "query",
             "schema": {
+              "format": "uuid",
               "type": "string"
             }
           },
@@ -2642,6 +2418,7 @@
             "required": false,
             "in": "query",
             "schema": {
+              "maxLength": 60,
               "type": "string"
             }
           }
@@ -2661,6 +2438,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "tags": [
@@ -2670,15 +2450,6 @@
       "post": {
         "operationId": "ExpensesController_create",
         "parameters": [
-          {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "name": "Idempotency-Key",
             "in": "header",
@@ -2713,6 +2484,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "tags": [
@@ -2724,15 +2498,6 @@
       "patch": {
         "operationId": "ExpensesController_update",
         "parameters": [
-          {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "name": "id",
             "required": true,
@@ -2767,6 +2532,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "tags": [
@@ -2778,15 +2546,6 @@
       "post": {
         "operationId": "ExpensesController_reverse",
         "parameters": [
-          {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "name": "id",
             "required": true,
@@ -2829,6 +2588,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "tags": [
@@ -2840,15 +2602,6 @@
       "get": {
         "operationId": "ReportsController_overview",
         "parameters": [
-          {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "name": "preset",
             "required": false,
@@ -2871,6 +2624,7 @@
             "in": "query",
             "description": "YYYY-MM-DD, needed for custom.",
             "schema": {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
               "type": "string"
             }
           },
@@ -2880,6 +2634,7 @@
             "in": "query",
             "description": "YYYY-MM-DD, needed for custom.",
             "schema": {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
               "type": "string"
             }
           }
@@ -2899,6 +2654,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "summary": "Dashboard metrics. Profit and cost figures appear only with reports.financial.",
@@ -2911,15 +2669,6 @@
       "get": {
         "operationId": "ReportsController_sales",
         "parameters": [
-          {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "name": "preset",
             "required": false,
@@ -2942,6 +2691,7 @@
             "in": "query",
             "description": "YYYY-MM-DD, needed for custom.",
             "schema": {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
               "type": "string"
             }
           },
@@ -2951,6 +2701,7 @@
             "in": "query",
             "description": "YYYY-MM-DD, needed for custom.",
             "schema": {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
               "type": "string"
             }
           }
@@ -2970,6 +2721,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "tags": [
@@ -2981,15 +2735,6 @@
       "get": {
         "operationId": "ReportsController_collections",
         "parameters": [
-          {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "name": "preset",
             "required": false,
@@ -3012,6 +2757,7 @@
             "in": "query",
             "description": "YYYY-MM-DD, needed for custom.",
             "schema": {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
               "type": "string"
             }
           },
@@ -3021,6 +2767,7 @@
             "in": "query",
             "description": "YYYY-MM-DD, needed for custom.",
             "schema": {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
               "type": "string"
             }
           }
@@ -3040,6 +2787,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "tags": [
@@ -3051,15 +2801,6 @@
       "get": {
         "operationId": "ReportsController_receivables",
         "parameters": [
-          {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "name": "preset",
             "required": false,
@@ -3082,6 +2823,7 @@
             "in": "query",
             "description": "YYYY-MM-DD, needed for custom.",
             "schema": {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
               "type": "string"
             }
           },
@@ -3091,6 +2833,7 @@
             "in": "query",
             "description": "YYYY-MM-DD, needed for custom.",
             "schema": {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
               "type": "string"
             }
           }
@@ -3110,6 +2853,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "tags": [
@@ -3121,15 +2867,6 @@
       "get": {
         "operationId": "ReportsController_expenses",
         "parameters": [
-          {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "name": "preset",
             "required": false,
@@ -3152,6 +2889,7 @@
             "in": "query",
             "description": "YYYY-MM-DD, needed for custom.",
             "schema": {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
               "type": "string"
             }
           },
@@ -3161,6 +2899,7 @@
             "in": "query",
             "description": "YYYY-MM-DD, needed for custom.",
             "schema": {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
               "type": "string"
             }
           }
@@ -3180,6 +2919,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "tags": [
@@ -3191,15 +2933,6 @@
       "get": {
         "operationId": "ReportsController_profit",
         "parameters": [
-          {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "name": "preset",
             "required": false,
@@ -3222,6 +2955,7 @@
             "in": "query",
             "description": "YYYY-MM-DD, needed for custom.",
             "schema": {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
               "type": "string"
             }
           },
@@ -3231,6 +2965,7 @@
             "in": "query",
             "description": "YYYY-MM-DD, needed for custom.",
             "schema": {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
               "type": "string"
             }
           }
@@ -3250,6 +2985,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "tags": [
@@ -3260,17 +2998,7 @@
     "/api/v1/reports/inventory": {
       "get": {
         "operationId": "ReportsController_inventory",
-        "parameters": [
-          {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "parameters": [],
         "responses": {
           "200": {
             "description": "",
@@ -3286,6 +3014,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "tags": [
@@ -3297,15 +3028,6 @@
       "get": {
         "operationId": "ReportsController_products",
         "parameters": [
-          {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "name": "preset",
             "required": false,
@@ -3328,6 +3050,7 @@
             "in": "query",
             "description": "YYYY-MM-DD, needed for custom.",
             "schema": {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
               "type": "string"
             }
           },
@@ -3337,6 +3060,7 @@
             "in": "query",
             "description": "YYYY-MM-DD, needed for custom.",
             "schema": {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
               "type": "string"
             }
           }
@@ -3356,6 +3080,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "tags": [
@@ -3367,15 +3094,6 @@
       "get": {
         "operationId": "ReportsController_staff",
         "parameters": [
-          {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "name": "preset",
             "required": false,
@@ -3398,6 +3116,7 @@
             "in": "query",
             "description": "YYYY-MM-DD, needed for custom.",
             "schema": {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
               "type": "string"
             }
           },
@@ -3407,6 +3126,7 @@
             "in": "query",
             "description": "YYYY-MM-DD, needed for custom.",
             "schema": {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
               "type": "string"
             }
           }
@@ -3426,6 +3146,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "tags": [
@@ -3436,17 +3159,7 @@
     "/api/v1/sync/operations": {
       "post": {
         "operationId": "SyncController_submit",
-        "parameters": [
-          {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
@@ -3472,6 +3185,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "summary": "Send operations recorded offline. Safe to retry.",
@@ -3483,17 +3199,7 @@
     "/api/v1/sync/status": {
       "get": {
         "operationId": "SyncController_status",
-        "parameters": [
-          {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "parameters": [],
         "responses": {
           "200": {
             "description": "",
@@ -3509,6 +3215,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "tags": [
@@ -3520,15 +3229,6 @@
       "post": {
         "operationId": "SyncController_resolve",
         "parameters": [
-          {
-            "name": "X-Business-Id",
-            "in": "header",
-            "description": "The active business.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "name": "id",
             "required": true,
@@ -3563,6 +3263,9 @@
         "security": [
           {
             "bearer": []
+          },
+          {
+            "business": []
           }
         ],
         "summary": "Decide what happens to a conflicting or rejected offline operation",
@@ -3586,6 +3289,12 @@
         "scheme": "bearer",
         "bearerFormat": "JWT",
         "type": "http"
+      },
+      "business": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Business-Id",
+        "description": "The active business. Membership is verified on every request."
       }
     },
     "schemas": {
@@ -3594,6 +3303,7 @@
         "properties": {
           "phone": {
             "type": "string",
+            "maxLength": 25,
             "example": "0801 234 5678",
             "description": "Nigerian mobile number in any common format."
           }
@@ -3604,21 +3314,35 @@
       },
       "OtpRequestResponse": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "expiresInSeconds": {
+            "type": "number"
+          },
+          "resendAfterSeconds": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "expiresInSeconds",
+          "resendAfterSeconds"
+        ]
       },
       "OtpVerifyDto": {
         "type": "object",
         "properties": {
           "phone": {
             "type": "string",
+            "maxLength": 25,
             "example": "0801 234 5678"
           },
           "code": {
             "type": "string",
+            "pattern": "^\\d{6}$",
             "example": "123456"
           },
           "deviceName": {
             "type": "string",
+            "maxLength": 80,
             "example": "Chrome on Android"
           }
         },
@@ -3627,27 +3351,155 @@
           "code"
         ]
       },
+      "UserSummary": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "phone",
+          "name"
+        ]
+      },
+      "MembershipSummary": {
+        "type": "object",
+        "properties": {
+          "businessId": {
+            "type": "string"
+          },
+          "businessName": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "currency": {
+            "type": "string"
+          },
+          "timezone": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "businessId",
+          "businessName",
+          "role",
+          "permissions",
+          "currency",
+          "timezone"
+        ]
+      },
       "AuthResponse": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "accessToken": {
+            "type": "string"
+          },
+          "expiresInSeconds": {
+            "type": "number"
+          },
+          "user": {
+            "$ref": "#/components/schemas/UserSummary"
+          },
+          "memberships": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MembershipSummary"
+            }
+          }
+        },
+        "required": [
+          "accessToken",
+          "expiresInSeconds",
+          "user",
+          "memberships"
+        ]
       },
       "RefreshResponse": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "accessToken": {
+            "type": "string"
+          },
+          "expiresInSeconds": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "accessToken",
+          "expiresInSeconds"
+        ]
       },
       "SessionInfo": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "deviceName": {
+            "type": "string",
+            "nullable": true
+          },
+          "userAgent": {
+            "type": "string",
+            "nullable": true
+          },
+          "lastUsedAt": {
+            "type": "string"
+          },
+          "current": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "deviceName",
+          "userAgent",
+          "lastUsedAt",
+          "current"
+        ]
       },
       "MeResponse": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/UserSummary"
+          },
+          "memberships": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MembershipSummary"
+            }
+          }
+        },
+        "required": [
+          "user",
+          "memberships"
+        ]
       },
       "UpdateProfileDto": {
         "type": "object",
         "properties": {
           "name": {
             "type": "string",
+            "minLength": 2,
+            "maxLength": 80,
             "example": "Amaka Okafor"
           }
         },
@@ -3657,13 +3509,33 @@
       },
       "BusinessCategoryDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "suggestedUnits": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "suggestedUnits"
+        ]
       },
       "CreateBusinessDto": {
         "type": "object",
         "properties": {
           "name": {
             "type": "string",
+            "minLength": 2,
+            "maxLength": 80,
             "example": "Amaka Provisions"
           },
           "category": {
@@ -3684,22 +3556,29 @@
             ]
           },
           "phone": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 25
           },
           "email": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 120,
+            "format": "email"
           },
           "address": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 200
           },
           "city": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 80
           },
           "state": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 80
           },
           "timezone": {
             "type": "string",
+            "maxLength": 60,
             "default": "Africa/Lagos",
             "description": "IANA timezone. Stored per business."
           },
@@ -3718,13 +3597,63 @@
       },
       "BusinessDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "address": {
+            "type": "string",
+            "nullable": true
+          },
+          "city": {
+            "type": "string",
+            "nullable": true
+          },
+          "state": {
+            "type": "string",
+            "nullable": true
+          },
+          "currency": {
+            "type": "string"
+          },
+          "timezone": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "category",
+          "phone",
+          "email",
+          "address",
+          "city",
+          "state",
+          "currency",
+          "timezone"
+        ]
       },
       "AcceptInvitationDto": {
         "type": "object",
         "properties": {
           "token": {
-            "type": "string"
+            "type": "string",
+            "minLength": 20,
+            "maxLength": 200
           }
         },
         "required": [
@@ -3735,7 +3664,9 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 80
           },
           "category": {
             "type": "string",
@@ -3755,43 +3686,111 @@
             ]
           },
           "phone": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 25
           },
           "email": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 120,
+            "format": "email"
           },
           "address": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 200
           },
           "city": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 80
           },
           "state": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 80
           },
           "timezone": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 60
           }
         }
       },
       "MemberDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string"
+          },
+          "role": {
+            "enum": [
+              "OWNER",
+              "MANAGER",
+              "CASHIER",
+              "INVENTORY_MANAGER"
+            ],
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "ACTIVE",
+              "SUSPENDED",
+              "REMOVED"
+            ],
+            "type": "string"
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "extraPermissions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "revokedPermissions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "userId",
+          "name",
+          "phone",
+          "role",
+          "status",
+          "permissions",
+          "extraPermissions",
+          "revokedPermissions"
+        ]
       },
       "InviteMemberDto": {
         "type": "object",
         "properties": {
           "phone": {
             "type": "string",
+            "maxLength": 25,
             "example": "0803 456 7890"
           },
           "role": {
-            "type": "string",
             "enum": [
               "MANAGER",
               "CASHIER",
               "INVENTORY_MANAGER"
-            ]
+            ],
+            "type": "string"
           }
         },
         "required": [
@@ -3805,41 +3804,98 @@
           "token": {
             "type": "string",
             "description": "Shown once. Share it with the invited person. It is stored only as a hash."
-          }
-        },
-        "required": [
-          "token"
-        ]
-      },
-      "InvitationDto": {
-        "type": "object",
-        "properties": {}
-      },
-      "UpdateMemberDto": {
-        "type": "object",
-        "properties": {
+          },
+          "id": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
           "role": {
             "type": "string",
             "enum": [
+              "OWNER",
               "MANAGER",
               "CASHIER",
               "INVENTORY_MANAGER"
             ]
           },
+          "expiresAt": {
+            "type": "string"
+          },
           "status": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "token",
+          "id",
+          "phone",
+          "role",
+          "expiresAt",
+          "status"
+        ]
+      },
+      "InvitationDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "role": {
             "type": "string",
+            "enum": [
+              "OWNER",
+              "MANAGER",
+              "CASHIER",
+              "INVENTORY_MANAGER"
+            ]
+          },
+          "expiresAt": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "phone",
+          "role",
+          "expiresAt",
+          "status"
+        ]
+      },
+      "UpdateMemberDto": {
+        "type": "object",
+        "properties": {
+          "role": {
+            "enum": [
+              "MANAGER",
+              "CASHIER",
+              "INVENTORY_MANAGER"
+            ],
+            "type": "string"
+          },
+          "status": {
             "enum": [
               "ACTIVE",
               "SUSPENDED"
-            ]
+            ],
+            "type": "string"
           },
           "extraPermissions": {
+            "maxItems": 40,
             "type": "array",
             "items": {
               "type": "string"
             }
           },
           "revokedPermissions": {
+            "maxItems": 40,
             "type": "array",
             "items": {
               "type": "string"
@@ -3847,6 +3903,7 @@
           },
           "reason": {
             "type": "string",
+            "maxLength": 300,
             "description": "Required when changing role, status or permissions."
           }
         }
@@ -3855,10 +3912,13 @@
         "type": "object",
         "properties": {
           "memberId": {
-            "type": "string"
+            "type": "string",
+            "format": "uuid"
           },
           "reason": {
-            "type": "string"
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 300
           }
         },
         "required": [
@@ -3872,18 +3932,153 @@
           "stockValueKobo": {
             "type": "number",
             "description": "Needs cost.read."
+          },
+          "activeProducts": {
+            "type": "number"
+          },
+          "lowStockCount": {
+            "type": "number"
+          },
+          "outOfStockCount": {
+            "type": "number"
+          },
+          "lowStock": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "productId": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "quantity": {
+                  "type": "string"
+                },
+                "reorderThreshold": {
+                  "type": "string"
+                },
+                "baseUnit": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "productId",
+                "name",
+                "quantity",
+                "reorderThreshold",
+                "baseUnit"
+              ]
+            }
           }
-        }
+        },
+        "required": [
+          "activeProducts",
+          "lowStockCount",
+          "outOfStockCount",
+          "lowStock"
+        ]
+      },
+      "StockMovementDto": {
+        "type": "object",
+        "properties": {
+          "unitCostKobo": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "productId": {
+            "type": "string"
+          },
+          "productName": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "DAMAGED",
+              "OPENING",
+              "RECEIPT",
+              "SALE",
+              "SALE_REVERSAL",
+              "ADJUSTMENT_IN",
+              "ADJUSTMENT_OUT"
+            ]
+          },
+          "quantityDelta": {
+            "type": "string"
+          },
+          "balanceAfter": {
+            "type": "string"
+          },
+          "reasonCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "note": {
+            "type": "string",
+            "nullable": true
+          },
+          "sourceType": {
+            "type": "string",
+            "nullable": true
+          },
+          "sourceId": {
+            "type": "string",
+            "nullable": true
+          },
+          "occurredAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "productId",
+          "productName",
+          "type",
+          "quantityDelta",
+          "balanceAfter",
+          "reasonCode",
+          "note",
+          "sourceType",
+          "sourceId",
+          "occurredAt"
+        ]
       },
       "StockMovementPage": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StockMovementDto"
+            }
+          },
+          "page": {
+            "type": "number"
+          },
+          "pageSize": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "total"
+        ]
       },
       "ReceiptLineDto": {
         "type": "object",
         "properties": {
           "productId": {
-            "type": "string"
+            "type": "string",
+            "format": "uuid"
           },
           "quantity": {
             "type": "string",
@@ -3892,10 +4087,12 @@
           },
           "unitId": {
             "type": "string",
+            "format": "uuid",
             "description": "A product unit conversion. Omit for the base unit."
           },
           "unitCostKobo": {
             "type": "number",
+            "minimum": 0,
             "description": "Cost of ONE of the chosen unit, in kobo."
           }
         },
@@ -3910,26 +4107,31 @@
         "properties": {
           "id": {
             "type": "string",
+            "format": "uuid",
             "description": "Client generated receipt id."
           },
           "paymentMethod": {
-            "type": "string",
             "enum": [
               "CASH",
               "TRANSFER"
             ],
+            "type": "string",
             "description": "How the supplier was paid."
           },
           "supplier": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 120
           },
           "note": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 300
           },
           "receivedAt": {
             "type": "string"
           },
           "lines": {
+            "minItems": 1,
+            "maxItems": 100,
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ReceiptLineDto"
@@ -3943,26 +4145,69 @@
       },
       "StockReceiptResult": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "totalCostKobo": {
+            "type": "number"
+          },
+          "lines": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "productId": {
+                  "type": "string"
+                },
+                "baseQuantity": {
+                  "type": "string"
+                },
+                "unitCostKobo": {
+                  "type": "string"
+                },
+                "lineTotalKobo": {
+                  "type": "number"
+                },
+                "quantityAfter": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "productId",
+                "baseQuantity",
+                "unitCostKobo",
+                "lineTotalKobo",
+                "quantityAfter"
+              ]
+            }
+          }
+        },
+        "required": [
+          "id",
+          "totalCostKobo",
+          "lines"
+        ]
       },
       "CreateStockAdjustmentDto": {
         "type": "object",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "format": "uuid"
           },
           "productId": {
-            "type": "string"
+            "type": "string",
+            "format": "uuid"
           },
           "direction": {
-            "type": "string",
             "enum": [
               "IN",
               "OUT"
-            ]
+            ],
+            "type": "string"
           },
           "reason": {
-            "type": "string",
             "enum": [
               "COUNT_CORRECTION",
               "DAMAGED",
@@ -3970,7 +4215,8 @@
               "LOST_OR_STOLEN",
               "FOUND",
               "OTHER"
-            ]
+            ],
+            "type": "string"
           },
           "quantity": {
             "type": "string",
@@ -3979,6 +4225,8 @@
           },
           "note": {
             "type": "string",
+            "minLength": 3,
+            "maxLength": 300,
             "description": "Required. Explains the adjustment in the audit trail."
           }
         },
@@ -3992,17 +4240,66 @@
       },
       "StockAdjustmentResult": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "productId": {
+            "type": "string"
+          },
+          "movementType": {
+            "type": "string",
+            "enum": [
+              "DAMAGED",
+              "OPENING",
+              "RECEIPT",
+              "SALE",
+              "SALE_REVERSAL",
+              "ADJUSTMENT_IN",
+              "ADJUSTMENT_OUT"
+            ]
+          },
+          "quantityAfter": {
+            "type": "string"
+          },
+          "valueKobo": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "productId",
+          "movementType",
+          "quantityAfter",
+          "valueKobo"
+        ]
       },
       "CategoryDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "productCount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "productCount"
+        ]
       },
       "CreateCategoryDto": {
         "type": "object",
         "properties": {
           "name": {
             "type": "string",
+            "minLength": 2,
+            "maxLength": 60,
             "example": "Drinks"
           }
         },
@@ -4010,9 +4307,29 @@
           "name"
         ]
       },
-      "ProductPage": {
+      "ConversionDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "factor": {
+            "type": "string"
+          },
+          "sellingPriceKobo": {
+            "type": "number",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "factor",
+          "sellingPriceKobo"
+        ]
       },
       "ProductDto": {
         "type": "object",
@@ -4024,14 +4341,111 @@
           "stockValueKobo": {
             "type": "number",
             "description": "Quantity x average cost, in kobo. Needs cost.read."
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "sku": {
+            "type": "string",
+            "nullable": true
+          },
+          "barcode": {
+            "type": "string",
+            "nullable": true
+          },
+          "categoryId": {
+            "type": "string",
+            "nullable": true
+          },
+          "categoryName": {
+            "type": "string",
+            "nullable": true
+          },
+          "baseUnit": {
+            "type": "string"
+          },
+          "sellingPriceKobo": {
+            "type": "number"
+          },
+          "reorderThreshold": {
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "ACTIVE",
+              "ARCHIVED"
+            ],
+            "type": "string"
+          },
+          "quantity": {
+            "type": "string"
+          },
+          "isLowStock": {
+            "type": "boolean"
+          },
+          "conversions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ConversionDto"
+            }
+          },
+          "updatedAt": {
+            "type": "string"
           }
-        }
+        },
+        "required": [
+          "id",
+          "name",
+          "sku",
+          "barcode",
+          "categoryId",
+          "categoryName",
+          "baseUnit",
+          "sellingPriceKobo",
+          "reorderThreshold",
+          "status",
+          "quantity",
+          "isLowStock",
+          "conversions",
+          "updatedAt"
+        ]
+      },
+      "ProductPage": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductDto"
+            }
+          },
+          "page": {
+            "type": "number"
+          },
+          "pageSize": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "total"
+        ]
       },
       "ConversionInput": {
         "type": "object",
         "properties": {
           "name": {
             "type": "string",
+            "minLength": 1,
+            "maxLength": 30,
             "example": "carton"
           },
           "factor": {
@@ -4041,6 +4455,7 @@
           },
           "sellingPriceKobo": {
             "type": "number",
+            "minimum": 0,
             "description": "Optional selling price (kobo) for one of this unit."
           }
         },
@@ -4058,6 +4473,7 @@
           },
           "unitCostKobo": {
             "type": "number",
+            "minimum": 0,
             "description": "Cost per base unit in kobo."
           }
         },
@@ -4071,28 +4487,37 @@
         "properties": {
           "id": {
             "type": "string",
+            "format": "uuid",
             "description": "Client generated UUID, so a retry cannot create a duplicate."
           },
           "name": {
             "type": "string",
+            "minLength": 1,
+            "maxLength": 120,
             "example": "Peak Milk Tin 170g"
           },
           "sku": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 60
           },
           "barcode": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 60
           },
           "categoryId": {
-            "type": "string"
+            "type": "string",
+            "format": "uuid"
           },
           "baseUnit": {
             "type": "string",
+            "minLength": 1,
+            "maxLength": 30,
             "example": "piece",
             "description": "The unit stock is counted in."
           },
           "sellingPriceKobo": {
             "type": "number",
+            "minimum": 0,
             "description": "Selling price per base unit, in kobo."
           },
           "reorderThreshold": {
@@ -4100,6 +4525,7 @@
             "example": "10"
           },
           "conversions": {
+            "maxItems": 10,
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ConversionInput"
@@ -4119,19 +4545,25 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
           },
           "sku": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 60
           },
           "barcode": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 60
           },
           "categoryId": {
-            "type": "string"
+            "type": "string",
+            "format": "uuid"
           },
           "sellingPriceKobo": {
-            "type": "number"
+            "type": "number",
+            "minimum": 0
           },
           "reorderThreshold": {
             "type": "string"
@@ -4143,6 +4575,8 @@
         "properties": {
           "name": {
             "type": "string",
+            "minLength": 1,
+            "maxLength": 30,
             "example": "carton"
           },
           "factor": {
@@ -4152,6 +4586,7 @@
           },
           "sellingPriceKobo": {
             "type": "number",
+            "minimum": 0,
             "description": "Optional selling price (kobo) for one of this unit."
           }
         },
@@ -4164,7 +4599,8 @@
         "type": "object",
         "properties": {
           "productId": {
-            "type": "string"
+            "type": "string",
+            "format": "uuid"
           },
           "quantity": {
             "type": "string",
@@ -4173,18 +4609,22 @@
           },
           "unitId": {
             "type": "string",
+            "format": "uuid",
             "description": "Unit conversion id. Omit for the base unit."
           },
           "unitPriceKobo": {
             "type": "number",
+            "minimum": 0,
             "description": "Price per unit in kobo. Differing from the list price needs sales.price_override."
           },
           "discountKobo": {
             "type": "number",
+            "minimum": 0,
             "description": "Discount on this line in kobo. Needs sales.discount."
           },
           "overrideReason": {
             "type": "string",
+            "maxLength": 200,
             "description": "Optional reason for a discount or override."
           }
         },
@@ -4197,15 +4637,16 @@
         "type": "object",
         "properties": {
           "method": {
-            "type": "string",
             "enum": [
               "CASH",
               "TRANSFER",
               "CREDIT"
-            ]
+            ],
+            "type": "string"
           },
           "amountKobo": {
             "type": "number",
+            "minimum": 1,
             "description": "Kobo. All payments must add up to the sale total."
           }
         },
@@ -4219,6 +4660,7 @@
         "properties": {
           "id": {
             "type": "string",
+            "format": "uuid",
             "description": "Client generated UUID. Offline sales keep the same id when they sync."
           },
           "occurredAt": {
@@ -4227,15 +4669,20 @@
           },
           "customerId": {
             "type": "string",
+            "format": "uuid",
             "description": "Required for credit. Walk in sales leave it out."
           },
           "items": {
+            "minItems": 1,
+            "maxItems": 100,
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/SaleItemInput"
             }
           },
           "payments": {
+            "minItems": 1,
+            "maxItems": 3,
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/SalePaymentInput"
@@ -4243,16 +4690,115 @@
           },
           "dueDate": {
             "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
             "example": "2026-12-01",
             "description": "Due date for the credit part."
           },
           "note": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 300
           }
         },
         "required": [
           "items",
           "payments"
+        ]
+      },
+      "SaleItemDto": {
+        "type": "object",
+        "properties": {
+          "unitCostKobo": {
+            "type": "string",
+            "description": "Needs cost.read."
+          },
+          "cogsKobo": {
+            "type": "number",
+            "description": "Needs cost.read."
+          },
+          "id": {
+            "type": "string"
+          },
+          "productId": {
+            "type": "string",
+            "nullable": true
+          },
+          "productName": {
+            "type": "string"
+          },
+          "sku": {
+            "type": "string",
+            "nullable": true
+          },
+          "unitName": {
+            "type": "string"
+          },
+          "unitFactor": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "string"
+          },
+          "baseQuantity": {
+            "type": "string"
+          },
+          "listPriceKobo": {
+            "type": "number"
+          },
+          "unitPriceKobo": {
+            "type": "number"
+          },
+          "discountKobo": {
+            "type": "number"
+          },
+          "lineTotalKobo": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "productId",
+          "productName",
+          "sku",
+          "unitName",
+          "unitFactor",
+          "quantity",
+          "baseQuantity",
+          "listPriceKobo",
+          "unitPriceKobo",
+          "discountKobo",
+          "lineTotalKobo"
+        ]
+      },
+      "SalePaymentDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "method": {
+            "type": "string",
+            "enum": [
+              "CASH",
+              "TRANSFER"
+            ]
+          },
+          "status": {
+            "type": "string"
+          },
+          "amountKobo": {
+            "type": "number"
+          },
+          "verified": {
+            "type": "boolean",
+            "description": "True only when the money is verified as settled. Transfers entered by hand are not."
+          }
+        },
+        "required": [
+          "id",
+          "method",
+          "status",
+          "amountKobo",
+          "verified"
         ]
       },
       "SaleDto": {
@@ -4265,101 +4811,418 @@
           "grossProfitKobo": {
             "type": "number",
             "description": "Needs cost.read."
+          },
+          "id": {
+            "type": "string"
+          },
+          "receiptNumber": {
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "REVERSED",
+              "COMPLETED"
+            ],
+            "type": "string"
+          },
+          "customer": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name"
+            ]
+          },
+          "cashier": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string",
+                "nullable": true
+              }
+            },
+            "required": [
+              "id",
+              "name"
+            ]
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SaleItemDto"
+            }
+          },
+          "payments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SalePaymentDto"
+            }
+          },
+          "subtotalKobo": {
+            "type": "number"
+          },
+          "discountKobo": {
+            "type": "number"
+          },
+          "totalKobo": {
+            "type": "number"
+          },
+          "creditKobo": {
+            "type": "number"
+          },
+          "outstandingKobo": {
+            "type": "number"
+          },
+          "dueDate": {
+            "type": "string",
+            "nullable": true
+          },
+          "note": {
+            "type": "string",
+            "nullable": true
+          },
+          "occurredAt": {
+            "type": "string"
+          },
+          "reversal": {
+            "type": "object",
+            "properties": {
+              "reason": {
+                "type": "string"
+              },
+              "at": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "reason",
+              "at"
+            ]
           }
-        }
+        },
+        "required": [
+          "id",
+          "receiptNumber",
+          "status",
+          "customer",
+          "cashier",
+          "items",
+          "payments",
+          "subtotalKobo",
+          "discountKobo",
+          "totalKobo",
+          "creditKobo",
+          "outstandingKobo",
+          "dueDate",
+          "note",
+          "occurredAt",
+          "reversal"
+        ]
       },
       "SalePage": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SaleDto"
+            }
+          },
+          "page": {
+            "type": "number"
+          },
+          "pageSize": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "total"
+        ]
       },
       "ReverseSaleDto": {
         "type": "object",
         "properties": {
           "reason": {
-            "type": "string"
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 300
           }
         },
         "required": [
           "reason"
         ]
       },
+      "CustomerDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "notes": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "enum": [
+              "ACTIVE",
+              "ARCHIVED"
+            ],
+            "type": "string"
+          },
+          "outstandingKobo": {
+            "type": "number",
+            "description": "Unpaid credit sales as of now."
+          },
+          "overdueKobo": {
+            "type": "number",
+            "description": "The part of outstanding that is past its due date."
+          },
+          "createdAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "phone",
+          "notes",
+          "status",
+          "outstandingKobo",
+          "overdueKobo",
+          "createdAt"
+        ]
+      },
       "CustomerPage": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CustomerDto"
+            }
+          },
+          "page": {
+            "type": "number"
+          },
+          "pageSize": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          },
+          "totalOutstandingKobo": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "total",
+          "totalOutstandingKobo"
+        ]
       },
       "CreateCustomerDto": {
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
+            "format": "uuid",
             "description": "Client generated UUID so offline creation is retry safe."
           },
           "name": {
             "type": "string",
+            "minLength": 2,
+            "maxLength": 80,
             "example": "Mama Tunde"
           },
           "phone": {
             "type": "string",
+            "maxLength": 25,
             "example": "0805 111 2222"
           },
           "notes": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 300
           }
         },
         "required": [
           "name"
         ]
       },
-      "CustomerDto": {
-        "type": "object",
-        "properties": {}
-      },
       "UpdateCustomerDto": {
         "type": "object",
         "properties": {
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 80
           },
           "phone": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 25
           },
           "notes": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 300
           },
           "status": {
-            "type": "string",
             "enum": [
               "ACTIVE",
               "ARCHIVED"
-            ]
+            ],
+            "type": "string"
           }
         }
       },
+      "StatementRow": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "SALE",
+              "SALE_REVERSAL",
+              "REPAYMENT",
+              "PENDING_TRANSFER"
+            ]
+          },
+          "reference": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "chargedKobo": {
+            "type": "number"
+          },
+          "paidKobo": {
+            "type": "number"
+          },
+          "balanceKobo": {
+            "type": "number",
+            "description": "Running balance after this row. Pending transfers do not change it."
+          }
+        },
+        "required": [
+          "date",
+          "type",
+          "reference",
+          "description",
+          "chargedKobo",
+          "paidKobo",
+          "balanceKobo"
+        ]
+      },
       "StatementDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "customer": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "phone": {
+                "type": "string",
+                "nullable": true
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "phone"
+            ]
+          },
+          "businessName": {
+            "type": "string"
+          },
+          "fromDate": {
+            "type": "string"
+          },
+          "toDate": {
+            "type": "string"
+          },
+          "openingBalanceKobo": {
+            "type": "number"
+          },
+          "rows": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StatementRow"
+            }
+          },
+          "closingBalanceKobo": {
+            "type": "number"
+          },
+          "generatedAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "customer",
+          "businessName",
+          "fromDate",
+          "toDate",
+          "openingBalanceKobo",
+          "rows",
+          "closingBalanceKobo",
+          "generatedAt"
+        ]
       },
       "RepaymentDto": {
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
+            "format": "uuid",
             "description": "Client generated payment id."
           },
           "amountKobo": {
             "type": "number",
+            "minimum": 1,
             "description": "Kobo. Cannot be more than the amount owed."
           },
           "method": {
-            "type": "string",
             "enum": [
               "CASH",
               "TRANSFER"
             ],
+            "type": "string",
             "description": "A transfer stays unverified and does not reduce the balance until it is verified."
           },
           "note": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 200
           },
           "occurredAt": {
             "type": "string"
@@ -4372,21 +5235,168 @@
       },
       "RepaymentResult": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "paymentId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "verified": {
+            "type": "boolean"
+          },
+          "amountKobo": {
+            "type": "number"
+          },
+          "allocations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "receivableId": {
+                  "type": "string"
+                },
+                "receiptNumber": {
+                  "type": "string"
+                },
+                "amountKobo": {
+                  "type": "number"
+                },
+                "remainingKobo": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "receivableId",
+                "receiptNumber",
+                "amountKobo",
+                "remainingKobo"
+              ]
+            }
+          },
+          "customerOutstandingKobo": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "paymentId",
+          "status",
+          "verified",
+          "amountKobo",
+          "allocations",
+          "customerOutstandingKobo"
+        ]
+      },
+      "ReceivableDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "customerId": {
+            "type": "string"
+          },
+          "customerName": {
+            "type": "string"
+          },
+          "saleId": {
+            "type": "string"
+          },
+          "receiptNumber": {
+            "type": "string"
+          },
+          "originalKobo": {
+            "type": "number"
+          },
+          "outstandingKobo": {
+            "type": "number"
+          },
+          "dueDate": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "OPEN",
+              "PARTIAL",
+              "SETTLED",
+              "VOIDED"
+            ]
+          },
+          "isOverdue": {
+            "type": "boolean"
+          },
+          "daysOverdue": {
+            "type": "number"
+          },
+          "saleDate": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "customerId",
+          "customerName",
+          "saleId",
+          "receiptNumber",
+          "originalKobo",
+          "outstandingKobo",
+          "dueDate",
+          "status",
+          "isOverdue",
+          "daysOverdue",
+          "saleDate"
+        ]
       },
       "ReceivablePage": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReceivableDto"
+            }
+          },
+          "page": {
+            "type": "number"
+          },
+          "pageSize": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "total"
+        ]
       },
       "ExpenseCategoryDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
       },
       "CreateExpenseCategoryDto": {
         "type": "object",
         "properties": {
           "name": {
             "type": "string",
+            "minLength": 2,
+            "maxLength": 60,
             "example": "Generator fuel"
           }
         },
@@ -4394,39 +5404,132 @@
           "name"
         ]
       },
+      "ExpenseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "categoryId": {
+            "type": "string"
+          },
+          "categoryName": {
+            "type": "string"
+          },
+          "amountKobo": {
+            "type": "number"
+          },
+          "method": {
+            "enum": [
+              "CASH",
+              "TRANSFER"
+            ],
+            "type": "string"
+          },
+          "expenseDate": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "REVERSED",
+              "POSTED"
+            ],
+            "type": "string"
+          },
+          "reversalReason": {
+            "type": "string",
+            "nullable": true
+          },
+          "createdById": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "categoryId",
+          "categoryName",
+          "amountKobo",
+          "method",
+          "expenseDate",
+          "description",
+          "status",
+          "reversalReason",
+          "createdById",
+          "createdAt"
+        ]
+      },
       "ExpensePage": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExpenseDto"
+            }
+          },
+          "page": {
+            "type": "number"
+          },
+          "pageSize": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          },
+          "totalPostedKobo": {
+            "type": "number",
+            "description": "Sum of POSTED expenses matching the filter."
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "total",
+          "totalPostedKobo"
+        ]
       },
       "CreateExpenseDto": {
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
+            "format": "uuid",
             "description": "Client generated UUID. Retries and offline sync reuse it."
           },
           "categoryId": {
-            "type": "string"
+            "type": "string",
+            "format": "uuid"
           },
           "amountKobo": {
             "type": "number",
+            "minimum": 1,
             "description": "Kobo."
           },
           "method": {
-            "type": "string",
             "enum": [
               "CASH",
               "TRANSFER"
             ],
+            "type": "string",
             "description": "How it was paid."
           },
           "expenseDate": {
             "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
             "example": "2026-11-14",
             "description": "Business local date. Defaults to today."
           },
           "description": {
             "type": "string",
+            "minLength": 3,
+            "maxLength": 200,
             "example": "Diesel for the generator"
           }
         },
@@ -4437,15 +5540,13 @@
           "description"
         ]
       },
-      "ExpenseDto": {
-        "type": "object",
-        "properties": {}
-      },
       "UpdateExpenseDto": {
         "type": "object",
         "properties": {
           "description": {
             "type": "string",
+            "minLength": 3,
+            "maxLength": 200,
             "description": "Only the description can be edited. Money changes need a reversal and a new expense."
           }
         },
@@ -4457,11 +5558,55 @@
         "type": "object",
         "properties": {
           "reason": {
-            "type": "string"
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 300
           }
         },
         "required": [
           "reason"
+        ]
+      },
+      "RangeInfo": {
+        "type": "object",
+        "properties": {
+          "preset": {
+            "type": "string"
+          },
+          "fromDate": {
+            "type": "string"
+          },
+          "toDate": {
+            "type": "string"
+          },
+          "timezone": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "preset",
+          "fromDate",
+          "toDate",
+          "timezone",
+          "currency"
+        ]
+      },
+      "SeriesPoint": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string"
+          },
+          "valueKobo": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "date",
+          "valueKobo"
         ]
       },
       "OverviewReport": {
@@ -4486,63 +5631,582 @@
           "inventoryValueKobo": {
             "type": "number",
             "description": "On hand quantity x average cost, now. Needs cost.read."
+          },
+          "range": {
+            "$ref": "#/components/schemas/RangeInfo"
+          },
+          "revenueKobo": {
+            "type": "number",
+            "description": "Net recognised sales in the period, credit sales included, reversals deducted."
+          },
+          "salesCount": {
+            "type": "number"
+          },
+          "collectedKobo": {
+            "type": "number",
+            "description": "Settled cash in the period. Not the same as revenue."
+          },
+          "pendingTransfersKobo": {
+            "type": "number",
+            "description": "Transfers entered but not verified. Not counted as collected."
+          },
+          "outstandingDebtKobo": {
+            "type": "number",
+            "description": "Unpaid customer credit at the end of the period."
+          },
+          "lowStockCount": {
+            "type": "number"
+          },
+          "revenueSeries": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SeriesPoint"
+            }
+          },
+          "topProducts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "productId": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "salesKobo": {
+                  "type": "number"
+                },
+                "units": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "productId",
+                "name",
+                "salesKobo",
+                "units"
+              ]
+            }
+          },
+          "recent": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "enum": [
+                    "EXPENSE",
+                    "SALE",
+                    "REPAYMENT"
+                  ],
+                  "type": "string"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "label": {
+                  "type": "string"
+                },
+                "amountKobo": {
+                  "type": "number"
+                },
+                "at": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "type",
+                "id",
+                "label",
+                "amountKobo",
+                "at"
+              ]
+            }
+          },
+          "definitions": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
           }
-        }
+        },
+        "required": [
+          "range",
+          "revenueKobo",
+          "salesCount",
+          "collectedKobo",
+          "pendingTransfersKobo",
+          "outstandingDebtKobo",
+          "lowStockCount",
+          "revenueSeries",
+          "topProducts",
+          "recent",
+          "definitions"
+        ]
       },
       "SalesReport": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "range": {
+            "$ref": "#/components/schemas/RangeInfo"
+          },
+          "grossSalesKobo": {
+            "type": "number"
+          },
+          "discountsKobo": {
+            "type": "number"
+          },
+          "reversalsKobo": {
+            "type": "number"
+          },
+          "netSalesKobo": {
+            "type": "number"
+          },
+          "transactionCount": {
+            "type": "number"
+          },
+          "reversedCount": {
+            "type": "number"
+          },
+          "paymentMix": {
+            "type": "object",
+            "properties": {
+              "cashKobo": {
+                "type": "number"
+              },
+              "transferKobo": {
+                "type": "number"
+              },
+              "creditKobo": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "cashKobo",
+              "transferKobo",
+              "creditKobo"
+            ]
+          },
+          "series": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SeriesPoint"
+            }
+          }
+        },
+        "required": [
+          "range",
+          "grossSalesKobo",
+          "discountsKobo",
+          "reversalsKobo",
+          "netSalesKobo",
+          "transactionCount",
+          "reversedCount",
+          "paymentMix",
+          "series"
+        ]
       },
       "CollectionsReport": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "range": {
+            "$ref": "#/components/schemas/RangeInfo"
+          },
+          "cashFromSalesKobo": {
+            "type": "number"
+          },
+          "cashFromRepaymentsKobo": {
+            "type": "number"
+          },
+          "refundsKobo": {
+            "type": "number"
+          },
+          "netCollectedKobo": {
+            "type": "number"
+          },
+          "pendingTransfersKobo": {
+            "type": "number"
+          },
+          "pendingRepayments": {
+            "type": "object",
+            "properties": {
+              "count": {
+                "type": "number"
+              },
+              "amountKobo": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "count",
+              "amountKobo"
+            ]
+          }
+        },
+        "required": [
+          "range",
+          "cashFromSalesKobo",
+          "cashFromRepaymentsKobo",
+          "refundsKobo",
+          "netCollectedKobo",
+          "pendingTransfersKobo",
+          "pendingRepayments"
+        ]
       },
       "ReceivablesReport": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "asOf": {
+            "type": "string"
+          },
+          "totalOutstandingKobo": {
+            "type": "number"
+          },
+          "overdueKobo": {
+            "type": "number"
+          },
+          "buckets": {
+            "type": "object",
+            "properties": {
+              "current": {
+                "type": "number"
+              },
+              "noDueDate": {
+                "type": "number"
+              },
+              "days1to30": {
+                "type": "number"
+              },
+              "days31to60": {
+                "type": "number"
+              },
+              "days61to90": {
+                "type": "number"
+              },
+              "days90plus": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "current",
+              "noDueDate",
+              "days1to30",
+              "days31to60",
+              "days61to90",
+              "days90plus"
+            ]
+          },
+          "customers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "customerId": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "phone": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "outstandingKobo": {
+                  "type": "number"
+                },
+                "oldestDueDate": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "openInvoices": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "customerId",
+                "name",
+                "phone",
+                "outstandingKobo",
+                "oldestDueDate",
+                "openInvoices"
+              ]
+            }
+          },
+          "repaymentsInPeriodKobo": {
+            "type": "number"
+          },
+          "range": {
+            "$ref": "#/components/schemas/RangeInfo"
+          }
+        },
+        "required": [
+          "asOf",
+          "totalOutstandingKobo",
+          "overdueKobo",
+          "buckets",
+          "customers",
+          "repaymentsInPeriodKobo",
+          "range"
+        ]
       },
       "ExpensesReport": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "range": {
+            "$ref": "#/components/schemas/RangeInfo"
+          },
+          "totalKobo": {
+            "type": "number"
+          },
+          "count": {
+            "type": "number"
+          },
+          "byCategory": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "categoryId": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "name": {
+                  "type": "string"
+                },
+                "totalKobo": {
+                  "type": "number"
+                },
+                "count": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "categoryId",
+                "name",
+                "totalKobo",
+                "count"
+              ]
+            }
+          }
+        },
+        "required": [
+          "range",
+          "totalKobo",
+          "count",
+          "byCategory"
+        ]
       },
       "ProfitReport": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "range": {
+            "$ref": "#/components/schemas/RangeInfo"
+          },
+          "revenueKobo": {
+            "type": "number"
+          },
+          "cogsKobo": {
+            "type": "number"
+          },
+          "grossProfitKobo": {
+            "type": "number"
+          },
+          "operatingExpensesKobo": {
+            "type": "number"
+          },
+          "stockAdjustmentsKobo": {
+            "type": "number"
+          },
+          "netOperatingProfitKobo": {
+            "type": "number"
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "range",
+          "revenueKobo",
+          "cogsKobo",
+          "grossProfitKobo",
+          "operatingExpensesKobo",
+          "stockAdjustmentsKobo",
+          "netOperatingProfitKobo",
+          "note"
+        ]
       },
       "InventoryReport": {
         "type": "object",
         "properties": {
           "totalValueKobo": {
             "type": "number"
+          },
+          "asOf": {
+            "type": "string"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "productId": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "sku": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "baseUnit": {
+                  "type": "string"
+                },
+                "quantity": {
+                  "type": "string"
+                },
+                "reorderThreshold": {
+                  "type": "string"
+                },
+                "isLowStock": {
+                  "type": "boolean"
+                },
+                "avgCostKobo": {
+                  "type": "string"
+                },
+                "valueKobo": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "productId",
+                "name",
+                "sku",
+                "baseUnit",
+                "quantity",
+                "reorderThreshold",
+                "isLowStock"
+              ]
+            }
+          },
+          "lowStockCount": {
+            "type": "number"
           }
-        }
+        },
+        "required": [
+          "asOf",
+          "items",
+          "lowStockCount"
+        ]
       },
       "ProductPerformanceReport": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "range": {
+            "$ref": "#/components/schemas/RangeInfo"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "productId": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "unitsSold": {
+                  "type": "string"
+                },
+                "salesKobo": {
+                  "type": "number"
+                },
+                "cogsKobo": {
+                  "type": "number"
+                },
+                "grossProfitKobo": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "productId",
+                "name",
+                "unitsSold",
+                "salesKobo"
+              ]
+            }
+          }
+        },
+        "required": [
+          "range",
+          "items"
+        ]
       },
       "StaffReport": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "range": {
+            "$ref": "#/components/schemas/RangeInfo"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "userId": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "phone": {
+                  "type": "string"
+                },
+                "salesCount": {
+                  "type": "number"
+                },
+                "salesKobo": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "userId",
+                "name",
+                "phone",
+                "salesCount",
+                "salesKobo"
+              ]
+            }
+          }
+        },
+        "required": [
+          "range",
+          "items"
+        ]
       },
       "SyncOperationInput": {
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
+            "format": "uuid",
             "description": "Client generated operation id. Also the idempotency key, so retries are safe."
           },
           "type": {
-            "type": "string",
             "enum": [
               "customer.create",
               "sale.create",
               "repayment.create",
               "expense.create"
-            ]
+            ],
+            "type": "string"
           },
           "payload": {
             "type": "object",
+            "additionalProperties": true,
             "description": "Same body the matching REST endpoint accepts. For repayment.create also send receivableId or customerId."
           },
           "clientCreatedAt": {
@@ -4561,9 +6225,12 @@
         "type": "object",
         "properties": {
           "deviceId": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 80
           },
           "operations": {
+            "minItems": 1,
+            "maxItems": 50,
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/SyncOperationInput"
@@ -4574,30 +6241,153 @@
           "operations"
         ]
       },
+      "SyncOperationResult": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "SYNCED",
+              "CONFLICT",
+              "FAILED_RETRYABLE",
+              "FAILED_FINAL",
+              "DISMISSED"
+            ],
+            "type": "string"
+          },
+          "errorCode": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "details": {
+            "type": "object"
+          },
+          "result": {
+            "type": "object",
+            "description": "The canonical record the server created, for SYNCED operations."
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "status"
+        ]
+      },
       "SyncBatchResult": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SyncOperationResult"
+            }
+          },
+          "serverTime": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "results",
+          "serverTime"
+        ]
       },
       "SyncStatusDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "counts": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "number"
+            }
+          },
+          "unresolved": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "errorCode": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "message": {
+                  "type": "string",
+                  "nullable": true
+                },
+                "details": {
+                  "type": "object"
+                },
+                "payload": {
+                  "type": "object"
+                },
+                "clientCreatedAt": {
+                  "type": "string"
+                },
+                "receivedAt": {
+                  "type": "string"
+                },
+                "attempts": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "id",
+                "type",
+                "status",
+                "errorCode",
+                "message",
+                "details",
+                "payload",
+                "clientCreatedAt",
+                "receivedAt",
+                "attempts"
+              ]
+            }
+          },
+          "serverTime": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "counts",
+          "unresolved",
+          "serverTime"
+        ]
       },
       "ResolveOperationDto": {
         "type": "object",
         "properties": {
           "action": {
-            "type": "string",
             "enum": [
               "EDIT_AND_POST",
               "DISMISS"
-            ]
+            ],
+            "type": "string"
           },
           "payload": {
             "type": "object",
+            "additionalProperties": true,
             "description": "The corrected body, for EDIT_AND_POST."
           },
           "reason": {
             "type": "string",
+            "minLength": 3,
+            "maxLength": 300,
             "description": "Why. Kept in the audit trail. Dismissing means the local transaction is never recorded."
           }
         },
@@ -4605,10 +6395,6 @@
           "action",
           "reason"
         ]
-      },
-      "SyncOperationResult": {
-        "type": "object",
-        "properties": {}
       }
     }
   }

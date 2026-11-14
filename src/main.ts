@@ -14,10 +14,27 @@ export function buildOpenApiConfig() {
     )
     .setVersion('1.0.0')
     .addBearerAuth()
+    .addApiKey(
+      {
+        type: 'apiKey',
+        name: 'X-Business-Id',
+        in: 'header',
+        description: 'The active business. Membership is verified on every request.',
+      },
+      'business',
+    )
     .build();
 }
 
 async function bootstrap() {
+  // Local development convenience. Production gets its environment from the platform.
+  if (process.env.NODE_ENV !== 'production') {
+    try {
+      process.loadEnvFile('.env');
+    } catch {
+      /* no .env file: rely on the real environment */
+    }
+  }
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
   configureApp(app, { useLogger: true });
   const config = app.get<AppConfig>(APP_CONFIG);

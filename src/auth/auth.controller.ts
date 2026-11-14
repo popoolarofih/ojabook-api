@@ -43,11 +43,14 @@ import { OtpService } from './otp/otp.service';
 import { IssuedSession, SessionService } from './session.service';
 
 export const REFRESH_COOKIE = 'ojabook_rt';
-// Per IP limits. Relaxed under test only, because every test shares one address.
+// Per IP limits are generous on purpose: many Nigerian mobile users share one public address
+// through carrier NAT, so a tight limit would lock out real people. The real protections are per
+// phone (resend cooldown, hourly cap, attempt lock in OtpService) and the 256 bit refresh secret.
+// Relaxed further under test, because every test shares one address.
 // Per phone limits (resend cooldown, hourly cap, attempt lock) are enforced in OtpService.
 const IS_TEST = process.env.NODE_ENV === 'test';
-const OTP_IP_LIMIT = IS_TEST ? 10_000 : 10;
-const REFRESH_IP_LIMIT = IS_TEST ? 10_000 : 30;
+const OTP_IP_LIMIT = IS_TEST ? 10_000 : 30;
+const REFRESH_IP_LIMIT = IS_TEST ? 10_000 : 120;
 const REFRESH_PATH = '/api/v1/auth';
 
 @ApiTags('auth')

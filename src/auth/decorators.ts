@@ -5,7 +5,7 @@ import {
   SetMetadata,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiHeader } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiSecurity } from '@nestjs/swagger';
 import { Request } from 'express';
 import { Permission } from '../common/permissions';
 import { BusinessGuard } from './business.guard';
@@ -23,7 +23,7 @@ export const RequirePermissions = (...permissions: Permission[]) =>
 export const Tenant = () =>
   applyDecorators(
     ApiBearerAuth(),
-    ApiHeader({ name: 'X-Business-Id', required: true, description: 'The active business.' }),
+    ApiSecurity('business'),
     UseGuards(BusinessGuard, PermissionsGuard),
   );
 
