@@ -24,6 +24,15 @@ import { LedgerModule } from './ledger/ledger.module';
 import { SalesModule } from './sales/sales.module';
 import { PrismaModule } from './prisma/prisma.module';
 
+function hasPinoPretty(): boolean {
+  try {
+    require.resolve('pino-pretty');
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 @Module({
   imports: [
     ConfigModule,
@@ -44,9 +53,12 @@ import { PrismaModule } from './prisma/prisma.module';
             'res.headers["set-cookie"]',
             'req.body.code',
           ],
-          transport: config.isProduction
-            ? undefined
-            : { target: 'pino-pretty', options: { singleLine: true } },
+          // pino-pretty is a devDependency and is pruned from the Docker image,
+          // so fall back to JSON logs whenever it is not installed.
+          transport:
+            !config.isProduction && hasPinoPretty()
+              ? { target: 'pino-pretty', options: { singleLine: true } }
+              : undefined,
         },
       }),
     }),
